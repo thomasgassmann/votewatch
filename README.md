@@ -1,39 +1,77 @@
-# Project Title
+# Vote Watch
 
 [[_TOC_]]
 
 ## Team Members
-1. Team member 1
-2. Team member 2
-3. Team member 3
-4. ...
-5. ...
+1. Marc Andriu Carigiet
+2. Thomas Gassmann
+3. Nick Ciardiello
+4. Thierry Meier
 
 ## Project Description 
-Describe here your project in detail and define your goals.
+Have a look at the project [pitch](pitch.md)
 
-### Project goals
-Describe here what are the goals of the project.
+### Project Goals
+Besides the high-level goals defined in [pitch](pitch.md), we aim to implement the four subtasks as defined in [Tasks](#Tasks).
 
 ### Data Sources
-Add here all used datasources and their origin.
+See the [references section](pitch.md#References) of pitch.
 
 ### Tasks
-Define all the tasks you want your app to solve.
 
+#### Bill-By-Bill (Visualization)
+**high-level idea:** Uncover the lobbies and how they vote with respect to each bill. Bills are sorted by some property, which results in a searchable list the user can interact with.
+
+**primarily responsible:** Marc
+
+**points to note:**
+- ...
+
+#### Lobbying Dynamics (Visualization)
+**high-level idea:** Visualize the lobbying organizations as network diagram. That is visualizing the influence that organizations have on each other as well as on the different political parties.
+
+**primarily responsible:** Thierry
+
+**points to note:**
+- incorporate information about
+    - the political parties
+    - the degree of influence on (other organizations | the different parties)
+        - possible encodings: color, edge weight
+- given a bill, visualize the organizations and their influence on the parliamentary voters
+    - this could be a useful extension to the Bill-By-Bill subtask
+
+#### Parliamentarian Pie (Visualization)
+**high-level idea:** Visualize the (seating | political party) arrangement of the parliament as half-disk. The user should be able to interact with the elements of this chart. When an element is clicked, it should display various statistics. E.g. if the element is a parliamentarian, statistics could include trivia such as the name and the party but also other information regarding lobbying, e.g. what connection an individual has to an organization (e.g. position) and how it governs their relationship.
+
+**primarily responsible:** Thomas
+
+**points to note:**
+- the important parts about the displayed statistics of a parliamentarian are the incoming/outgoing connections to special interest agents
+    - there is a lot of freedom in what statistics are to be reported 
+- if the visualization works for selecting a single element, one could extend the functionality to select two elements and compare their individual and mutual connections.
+
+#### Front- & Backend (Organization)
+**high-level idea:** This subtask is involved with the design of the frontend and how to user interacts between the three previously described visualizations. That is providing a unifying and coherent user experience/interface, which allows the user to explore the different interactive visualizations. Furthermore, this role encompasses the design of the backend which allows to efficiently cache and conveniently retrieve all the data needed by the visualizations through a well-defined interface.
+
+**primarily responsible:** Nick
+
+**points to note:**
+- each of the visualization subtasks are required to bring forth the data they essentially need to simplify the design of the backend.
+- preliminary idea for frontend
+    - search bar/list for the bills with the possibility to switch between the 3 tabs (i.e. one for each visualization)
 
 ## Requirements
-Write here all intructions to build the environment and run your code.\
+Write here all instructions to build the environment and run your code.\
 **NOTE:** If we cannot run your code following these requirements we will not be able to evaluate it.
 
 ## How to Run
-Write here **DETAILED** intructions on how to run your code.\
+Write here **DETAILED** instructions on how to run your code.\
 **NOTE:** If we cannot run your code following these instructions we will not be able to evaluate it.
 
 As an example here are the instructions to run the Dummy Project:
 To run the Dummy project you have to:
 - clone the repository;
-- open a terminal instance and using the command ```cd``` move to the folder where the project has been downloaded;
+- open a terminal instance and using the command `cd` move to the folder where the project has been downloaded;
 - then run:
 
 
@@ -61,22 +99,41 @@ docker run -it --rm -p 5173:5173 my-webapp
 Open a browser and connect to http://localhost:5173
 
 **run bash in interactive container**
+
 ```bash
 docker build -t my-webapp src/.
 
 docker run -it --rm -p 5173:5173 my-webapp bash
 ```
 
-
 ## Milestones
 Document here the major milestones of your code and future planned steps.\
 - [ ] Milestone 1
-  - [ ] Completed Sub-task: ...
-  - [ ] Completed Sub-task: ...
-
+    - [ ] mockup: bill-by-bill
+    - [ ] mockup: lobbying dynamics
+    - [ ] mockup: parliamentarian pie
+    - [ ] mockup: frontend
 - [ ] Milestone 2
-  - [ ] Sub-task: ...
-  - [ ] Sub-task: ...
+    - [ ] data requirements: bill-by-bill requirements 
+    - [ ] data requirements: lobbying dynamics mockup
+    - [ ] data requirements: parliamentarian pie mockup
+    - [ ] design: backend
+- [ ] Milestone 3
+    - [ ] preliminary implementation: bill-by-bill
+    - [ ] preliminary implementation: lobbying dynamics
+    - [ ] preliminary implementation: parliamentarian pie
+    - [ ] preliminary implementation: backend
+- [ ] Milestone 4
+    - [ ] integration: backend with bill-by-bill
+    - [ ] integration: backend with lobbying dynamics
+    - [ ] integration: backend with parliamentarian pie
+    - [ ] implementation: frontend
+- [ ] Milestone 5
+    - [ ] integration: frontend with bill-by-bill
+    - [ ] integration: frontend with lobbying dynamics
+    - [ ] integration: frontend with parliamentarian pie
+- [ ] Milestone 6
+    - [ ] finalize
 
 Create a list subtask.\
 Open an issue for each subtask. Once you create a subtask, link the corresponding issue.\
@@ -89,6 +146,15 @@ This will help you have a clearer overview of what you are currently doing, trac
 ## Weekly Summary 
 Write here a short summary with weekly progress, including challanges and open questions.\
 We will use this to understand what your struggles and where did the weekly effort go to.
+
+### Week 1 (Semester Week 10)
+
+Meeting was held (approx. 60 minutes) discussing details of the app (i.e. visualizations) and how to split the work.
+
+### Week 2 (Semester Week 11)
+
+Milestones 1 & 2 should be completed by Friday, 1st of December, 13:00
+
 
 ## Versioning
 Create stable versions of your code each week by using gitlab tags.\
