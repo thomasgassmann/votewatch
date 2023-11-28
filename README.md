@@ -12,10 +12,10 @@
 Have a look at the project [pitch](pitch.md)
 
 ### Project Goals
-Besides the high-level goals defined in [pitch](pitch.md), we aim to implement the four subtasks as defined in [Tasks](#Tasks).
+Besides the high-level goals defined in [pitch](pitch.md), we aim to implement the four subtasks as defined in [Tasks](#tasks).
 
 ### Data Sources
-See the [references section](pitch.md#References) of pitch.
+See the [references section](pitch.md#references) of pitch.
 
 ### Tasks
 
