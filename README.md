@@ -109,7 +109,7 @@ docker run -it --rm -p 5173:5173 my-webapp bash
 ## Milestones
 Document here the major milestones of your code and future planned steps.\
 - [ ] Milestone 1
-    - [ ] mockup: bill-by-bill
+    - [x] mockup: bill-by-bill
     - [ ] mockup: lobbying dynamics
     - [ ] mockup: parliamentarian pie
     - [ ] mockup: frontend
