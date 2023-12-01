@@ -114,7 +114,7 @@ Document here the major milestones of your code and future planned steps.\
     - [ ] mockup: parliamentarian pie
     - [ ] mockup: frontend
 - [ ] Milestone 2
-    - [ ] data requirements: bill-by-bill requirements 
+    - [x] data requirements: bill-by-bill requirements 
     - [ ] data requirements: lobbying dynamics mockup
     - [ ] data requirements: parliamentarian pie mockup
     - [ ] design: backend
