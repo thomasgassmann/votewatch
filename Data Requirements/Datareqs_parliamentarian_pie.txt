@@ -1,0 +1,25 @@
+- list of all parliamentarians (Nationalrat only) with:
+    - id
+    - name
+    - canton
+    - other basic information (optionally)
+    - some kind of score to color seat of parliamentarian
+        - lobbywatch has some kind of score?
+        - otherwise simple metric like number of lobbying organization and degree of involvement
+    - party
+        - id
+        - name
+    - related lobbying organization with:
+        - id (to link to lobbying dyamics page)
+        - name of organization
+        - position in organization
+        - general info for organization (Category, etc.)
+    - list of votes and the corresponding vote of this parliamentarian
+        - id (to link to bill by bill page)
+        - result of vote
+        - vote status of given parliamentarian
+        - bill status
+        - bill text
+    - committees of parliamentarian
+        - name
+    
