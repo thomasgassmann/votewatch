@@ -110,14 +110,14 @@ docker run -it --rm -p 5173:5173 my-webapp bash
 Document here the major milestones of your code and future planned steps.\
 - [ ] Milestone 1
     - [x] mockup: bill-by-bill
-    - [ ] mockup: lobbying dynamics
+    - [x] mockup: lobbying dynamics
     - [x] mockup: parliamentarian pie
-    - [ ] mockup: frontend
+    - [x] mockup: frontend
 - [ ] Milestone 2
     - [x] data requirements: bill-by-bill requirements 
-    - [ ] data requirements: lobbying dynamics mockup
+    - [x] data requirements: lobbying dynamics mockup
     - [x] data requirements: parliamentarian pie mockup
-    - [ ] design: backend
+    - [x] design: backend
 - [ ] Milestone 3
     - [ ] preliminary implementation: bill-by-bill
     - [ ] preliminary implementation: lobbying dynamics
