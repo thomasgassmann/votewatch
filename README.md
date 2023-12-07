@@ -155,6 +155,15 @@ Meeting was held (approx. 60 minutes) discussing details of the app (i.e. visual
 
 Milestones 1 & 2 should be completed by Friday, 1st of December, 13:00
 
+### Week 3 (Semester Week 12)
+
+Milestones 1 & 2 are finished. Furhter steps were disucssed:
+
+- Using Gitlab milestones and Gitlab issues for development tasks form now on, also work with merge requests
+- Using [shadcn](https://ui.shadcn.com/) as a component library
+- Using [Prisma ORM](https://github.com/prisma/prisma) for data access
+- Signed up for status update meeting on 14th of December
+- Discussed data requirements, preliminary data access should be implemented by the end of this week
 
 ## Versioning
 Create stable versions of your code each week by using gitlab tags.\
