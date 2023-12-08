@@ -1,0 +1,61 @@
+# Data Requirements @ Lobby Organization
+
+data-origin: 
+- https://cms.lobbywatch.ch/sites/lobbywatch.ch/files/exports/lobbywatch_export_parlamentarier.csv.zip
+
+required-fields:
+- parlamentarier_partei
+- parlamentarier_anzeige_name
+- interessenbindung_art
+- interessenbindung_beschreibung
+- interessenbindung_wirksamkeit
+- verguetung_beschreibung
+- organisation_id
+- organisation_name_de
+- organisation_rechtsform
+- organisation_interessengruppe1_branche
+- organisation_interessengruppe2_branche
+- organisation_interessengruppe3_branche
+- organisation_interessengruppe1
+- organisation_interessengruppe2
+- organisation_interessengruppe3
+
+info-about-required-fields:
+- parlamentarier_partei
+  - Beschreibung: Welche Partei der Parlamentarier angehörig ist
+
+- parlamentarier_anzeige_name
+  - Format: "Nachname, Vorname"
+  - Zweck: Upon zoom-in on party half of graph
+
+- interessenbindung_art
+  - Beschreibung: Rolle des Parlamentarier in dieser Organisation
+
+- interessenbindung_beschreibung
+  - Beschreibung: Rolle des Parlamentarier in dieser Organisation genauer
+
+- interessenbindung_wirksamkeit
+  - Beschreibung: Einfluss von Organisation auf Parlamentarier
+  - Format: "tief" | "mittel" | "hoch"
+  - Zweck: Definiert edgeweight im Graph
+
+- verguetung_beschreibung
+  - Beschreibung: Ob die Rolle des Parlamentarier bezahlt ist
+
+- organisation_id
+  - Beschreibung: unique identifier der Organisation
+
+- organisation_name_de
+
+- organisation_rechtsform
+  - Beschreibung: ob GmbH, AG, Verein, etc
+
+- organisation_interessengruppe1_branche
+- organisation_interessengruppe2_branche
+- organisation_interessengruppe3_branche
+  - Beschreibung: interessengruppe überkategorie (e.g. Energie, Bildung, etc)
+
+- organisation_interessengruppe1
+- organisation_interessengruppe2
+- organisation_interessengruppe3
+  - Beschreibung: interessengruppe genauer
