@@ -108,12 +108,12 @@ docker run -it --rm -p 5173:5173 my-webapp bash
 
 ## Milestones
 Document here the major milestones of your code and future planned steps.\
-- [ ] Milestone 1
+- [x] Milestone 1
     - [x] mockup: bill-by-bill
     - [x] mockup: lobbying dynamics
     - [x] mockup: parliamentarian pie
     - [x] mockup: frontend
-- [ ] Milestone 2
+- [x] Milestone 2
     - [x] data requirements: bill-by-bill requirements 
     - [x] data requirements: lobbying dynamics mockup
     - [x] data requirements: parliamentarian pie mockup
@@ -164,6 +164,12 @@ Milestones 1 & 2 are finished. Furhter steps were disucssed:
 - Using [Prisma ORM](https://github.com/prisma/prisma) for data access
 - Signed up for status update meeting on 14th of December
 - Discussed data requirements, preliminary data access should be implemented by the end of this week
+
+### Week 4 (Semester Week 13)
+
+- Initial work on frontend and infrastructure
+- Project progress meeting was held on 14th of December
+- Data schema created, postgres database and data access up and running
 
 ## Versioning
 Create stable versions of your code each week by using gitlab tags.\
