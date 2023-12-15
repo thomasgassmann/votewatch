@@ -7,10 +7,10 @@ import { groupBy } from "rambdax"
 
 export const metadata = {
   title: "Parliamentarians",
-  description: "See what the members of Parliament have been up to",
+  description: "See what the members of the national council have been up to",
 }
 
-export default async function BillsOverviewPage() {
+export default async function MembersPage() {
   // Just an example
 
   const members = groupBy((e) => `${e.party.fullName} (${e.party.shortName})`, await db.parliamentarian.findMany({
@@ -23,7 +23,7 @@ export default async function BillsOverviewPage() {
     <PageShell>
       <PageHeader
         heading="Parliamentarians"
-        text="See what the members of Parliament have been up to"
+        text="See what the members of the national council have been up to"
       />
       <div className="grid gap-10">
         <div className="rounded-md border">
