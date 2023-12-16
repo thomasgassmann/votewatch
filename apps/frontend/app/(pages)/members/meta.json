@@ -27,7 +27,22 @@
       "forthGroup": 8
     },
     {
-      "todo": "sleep"
+      "firstGroup": 9,
+      "secondGroup": 9,
+      "thirdGroup": 9,
+      "forthGroup": 9
+    },
+    {
+      "firstGroup": 10,
+      "secondGroup": 10,
+      "thirdGroup": 10,
+      "forthGroup": 10
+    },
+    {
+      "firstGroup": 6,
+      "secondGroup": 11,
+      "thirdGroup": 11,
+      "forthGroup": 6
     }
   ]
 }
