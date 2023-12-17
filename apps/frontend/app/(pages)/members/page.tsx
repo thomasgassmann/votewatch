@@ -1,9 +1,8 @@
-import { ListItem } from "@/components/list-item"
-
 import { PageHeader } from "../../../components/header"
 import { PageShell } from "../../../components/shell"
 import { db } from "@votewatch/database"
 import { groupBy } from "rambdax"
+import { Parliamentarians } from "./parliamentarians"
 
 export const metadata = {
   title: "Parliamentarians",
@@ -17,7 +16,7 @@ export default async function MembersPage() {
     include: {
       party: true,
     },
-  }))
+  }));
 
   return (
     <PageShell>
@@ -25,22 +24,7 @@ export default async function MembersPage() {
         heading="Parliamentarians"
         text="See what the members of the national council have been up to"
       />
-      <div className="grid gap-10">
-        <div className="rounded-md border">
-          {Object.entries(members).map(entry => <div>
-            <h3>{entry[0]}</h3>
-            <div className="flex w-full divide-x overflow-auto">
-          {entry[1].map((member) => (
-            <ListItem
-              key={member.id}
-              name={member.name}
-              description={`${member.party.fullName || member.party.shortName}`}
-            />
-          ))}
-          </div></div>)}
-        </div>
-      </div>
-      <pre className="font-mono">{JSON.stringify(members, null, 2)}</pre>
+      <Parliamentarians />
     </PageShell>
   )
 }
