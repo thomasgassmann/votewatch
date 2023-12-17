@@ -1,10 +1,16 @@
 'use client';
 
 import * as d3 from "d3";
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 
 import meta from './meta.json';
 import data from './seats.json';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@radix-ui/react-hover-card";
+import { Popover, PopoverContent } from "@radix-ui/react-popover";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { Badge } from "@/components/ui/badge";
 
 export type Parliamentarian = {
   number: number;
@@ -20,9 +26,22 @@ export type CouncilProps = {
   onSelect(parliamentarian: Parliamentarian): void;
 };
 
+let mouseX, mouseY = 0;
+
+if (typeof window !== 'undefined') {
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.pageX;
+    mouseY = e.pageY;
+  });
+}
+
 export const Council: FC<CouncilProps> = ({ onSelect }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const svgContainer = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const [hover, setHover] = useState<Parliamentarian | null>(null);
+  const [hoverPos, setHoverPos] = useState<[number, number]>([0, 0]);
 
   useEffect(() => {
     if (svgRef.current && svgContainer.current) {
@@ -55,14 +74,14 @@ export const Council: FC<CouncilProps> = ({ onSelect }) => {
       let rowNumber = 0;
       for (const row of meta.rows) {
         const angleDistance = Math.PI / (50 + rowNumber * 10);
-        const group1AngleFrom = -Math.PI / 2;
-        const group1AngleTo = -Math.PI / 4 - angleDistance;
+        let group1AngleFrom = -Math.PI / 2;
+        let group1AngleTo = -Math.PI / 4 - angleDistance;
         const group2AngleFrom = -Math.PI / 4 + angleDistance;
         const group2AngleTo = -angleDistance;
         const group3AngleFrom = angleDistance;
         const group3AngleTo = Math.PI / 4 - angleDistance;
-        const group4AngleFrom = Math.PI / 4 + angleDistance;
-        const group4AngleTo = Math.PI / 2;
+        let group4AngleFrom = Math.PI / 4 + angleDistance;
+        let group4AngleTo = Math.PI / 2;
         const memberAngleDistance = angleDistance / 2;
 
         const drawGroup = (fromAngle: number, toAngle: number, currentMembers: number[]) => {
@@ -72,43 +91,47 @@ export const Council: FC<CouncilProps> = ({ onSelect }) => {
           for (const memberNumber of currentMembers) {
             const member = data.find(x => x.number === memberNumber)!;
 
+            const currentParliamentarian: Parliamentarian = {
+              number: member.number,
+              name: member.councilorName,
+              imageUrl: 'https://www.parlament.ch/' + member.councilorPhotoUrl,
+              groupName: member.parlGroupName,
+              groupColor: member.parlGroupColour,
+              infoUrl: 'https://www.parlament.ch' + member.councilorDetailUrl,
+              canton: member.councilorCanton
+            };
+
             const arc = d3.arc()
               .innerRadius(currentRow)
               .outerRadius(currentRow + rowThickness)
               .startAngle(currentAngle)
               .endAngle(currentAngle + perMember);
 
-            const currentId =  `member-${memberNumber}`;
-            halfCircleGroup.append('text')
-              .append('textPath')
-              .style('font-size', '10px')
-              .attr('xlink:href', '#' + currentId)
-              .text(memberNumber.toString());
-
             halfCircleGroup.append('path')
-              .attr('id', currentId)
               .attr('d', arc)
               .style('fill', member.parlGroupColour)
               .style('cursor', 'pointer')
               .on('mouseover', function (d, i) {
+                setHoverPos([mouseX, mouseY]);
+                setHover(currentParliamentarian);
                 d3.select(this).transition()
-                     .duration(50)
-                     .style('fill-opacity', '.7')
+                  .duration(50)
+                  .style('fill-opacity', '.7');
               })
               .on('mouseout', function (d, i) {
+                if (cardRef.current &&
+                    cardRef.current.getBoundingClientRect().left <= mouseX && mouseX <= cardRef.current.getBoundingClientRect().right &&
+                    cardRef.current.getBoundingClientRect().top <= mouseY && mouseY <= cardRef.current.getBoundingClientRect().bottom) {
+                  return;
+                }
+
+                setHover(null);
+
                 d3.select(this).transition()
-                     .duration(50)
-                     .style('fill-opacity', '1')
+                  .duration(50)
+                  .style('fill-opacity', '1');
               })
-              .on('click', () => onSelect({
-                number: member.number,
-                name: member.councilorName,
-                imageUrl: 'https://www.parlament.ch/' + member.councilorPhotoUrl,
-                groupName: member.parlGroupName,
-                groupColor: member.parlGroupColour,
-                infoUrl: 'https://www.parlament.ch' + member.councilorDetailUrl,
-                canton: member.councilorCanton
-              }));
+              .on('click', () => onSelect(currentParliamentarian));
 
             currentAngle += perMember + memberAngleDistance;
           }
@@ -122,6 +145,11 @@ export const Council: FC<CouncilProps> = ({ onSelect }) => {
         const group3 = group34.splice(0, row.secondGroup);
         const group4 = group34;
 
+        if (rowNumber + 1 === meta.rows.length) {
+          group1AngleFrom += Math.PI / 10;
+          group4AngleTo -= Math.PI / 10;
+        }
+
         drawGroup(group1AngleFrom, group1AngleTo, group1.map(x => x.number));
         drawGroup(group2AngleFrom, group2AngleTo, group2.map(x => x.number));
         drawGroup(group3AngleFrom, group3AngleTo, group3.map(x => x.number));
@@ -132,10 +160,36 @@ export const Council: FC<CouncilProps> = ({ onSelect }) => {
         currentRow += rowDistance + rowThickness;
         rowNumber++;
       }
-    }
-  }, [onSelect]);
 
-  return <div ref={svgContainer} className="h-[450px] w-full">
-    <svg ref={svgRef} />
-  </div> ;
+    }
+  }, [onSelect, setHover, setHoverPos]);
+
+  return <>
+    <div ref={svgContainer} className="h-[450px] w-full">
+      <svg ref={svgRef} />
+    </div>
+    {hover !== null && <div style={{ position: 'absolute', top: `${hoverPos[1]}px`, left: `${hoverPos[0]}px` }}>
+      <Card ref={cardRef} className="mb-6">
+        <CardContent className="p-6">
+          <div className="mb-6 flex items-center space-x-4">
+            <Avatar className="h-20 w-20">
+              <AvatarImage alt={hover.name} src={hover.imageUrl} />
+            </Avatar>
+            <div>
+              <h2 className="text-xl font-bold">{hover.name}</h2>
+              <Badge className="mt-2" style={{
+                backgroundColor: hover.groupColor
+              }}>{hover.groupName}</Badge>
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button onClick={() => {
+            setHover(null);
+            onSelect(hover);
+          }}>Show</Button>
+        </CardFooter>
+      </Card>
+    </div>}
+  </>;
 };

@@ -56,24 +56,24 @@ export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian 
               Learn More
             </Link>
           </div>
-          <TabsContent className="p-1" value="votes">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold">Vote 1</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Details about Vote 1.</p>
-              <Link className="text-blue-500 underline" href="#">
-                Learn More
-              </Link>
-            </div>
-            <TabsContent className="p-1" value="committees">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold">Committee 1</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Details about Committee 1.</p>
-                <Link className="text-blue-500 underline" href="#">
-                  Learn More
-                </Link>
-              </div>
-            </TabsContent>
-          </TabsContent>
+        </TabsContent>
+        <TabsContent className="p-1" value="votes">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold">Vote 1</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Details about Vote 1.</p>
+            <Link className="text-blue-500 underline" href="#">
+              Learn More
+            </Link>
+          </div>
+        </TabsContent>
+        <TabsContent className="p-1" value="committees">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold">Committee 1</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Details about Committee 1.</p>
+            <Link className="text-blue-500 underline" href="#">
+              Learn More
+            </Link>
+          </div>
         </TabsContent>
       </Tabs>
     </section>
