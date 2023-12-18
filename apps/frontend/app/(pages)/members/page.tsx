@@ -1,8 +1,7 @@
 import { PageHeader } from "../../../components/header"
 import { PageShell } from "../../../components/shell"
 import { db } from "@votewatch/database"
-import { groupBy } from "rambdax"
-import { Parliamentarians } from "./parliamentarians"
+import { ParliamentarianEntry, Parliamentarians } from "./parliamentarians"
 
 export const metadata = {
   title: "Parliamentarians",
@@ -12,10 +11,39 @@ export const metadata = {
 export default async function MembersPage() {
   // Just an example
 
-  const members = groupBy((e) => `${e.party.fullName} (${e.party.shortName})`, await db.parliamentarian.findMany({
+  const members = await db.parliamentarian.findMany({
     include: {
       party: true,
+      relatedOrganizations: true,
+      bills: true,
+      votes: true,
+      committees: true,
+      canton: true
     },
+  });
+
+  const organizations = await db.lobbyOrganization.findMany();
+
+  const mps = members.map<ParliamentarianEntry>(x => ({
+    name: x.name,
+    canton: x.canton.name,
+    committees: x.committees.map(x => ({
+      name: x.name
+    })),
+    bills: x.bills.map(x => ({
+      title: x.title,
+      billText: x.billText,
+      voteResult: x.voteResult
+    })),
+    partyFullName: x.party.fullName,
+    partyShortName: x.party.shortName,
+    organizations: x.relatedOrganizations.map(x => ({
+      name: organizations.find(p => p.id === x.organizationId)!.name,
+      rechtsform: organizations.find(p => p.id === x.organizationId)!.rechtsform,
+      influenceLevel: x.influenceLevel,
+      vergueting: x.verguetung,
+      position: x.position
+    }))
   }));
 
   return (
