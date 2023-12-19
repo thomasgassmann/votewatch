@@ -44,6 +44,10 @@ export const parliamentarianFromEntry = (entry: ParliamentarianEntry): Parliamen
   return parliamentarianFromSeatsInformation(seatNumber);
 };
 
+export const entryFromParliamentarian = (entries: ParliamentarianEntry[], parl: Parliamentarian): ParliamentarianEntry | null => {
+  return entries.find(x => x.lastName + ' ' + x.firstName === parl.name) ?? null;
+}
+
 export const parliamentarianFromSeatsInformation = (number: number): Parliamentarian => {
   const member = data.find(x => x.number === number)!;
 
@@ -56,6 +60,32 @@ export const parliamentarianFromSeatsInformation = (number: number): Parliamenta
     infoUrl: 'https://www.parlament.ch' + member.councilorDetailUrl,
     canton: member.councilorCanton
   };
+};
+
+const countInfluence = (entry: ParliamentarianEntry): number => {
+  let total = 0;
+  for (const org of entry.organizations) {
+    switch (org.influenceLevel) {
+      case 'HOCH':
+        total += 5;
+        break;
+      case 'MITTEL':
+        total += 3;
+        break;
+      case 'TIEF':
+        total += 1;
+      case 'UNKNOWN':
+      default:
+        total += 1;
+    }
+  }
+
+  return total;
+}
+
+const calculateRelativeInfluenceScore = (entries: ParliamentarianEntry[], entry: ParliamentarianEntry): number => {
+  const highest = Math.max(...entries.map(x => countInfluence(x)));
+  return (countInfluence(entry) / highest) * 0.7 + 0.3;
 };
 
 export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
@@ -115,22 +145,25 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
             const member = data.find(x => x.number === memberNumber)!;
             const currentParliamentarian: Parliamentarian = parliamentarianFromSeatsInformation(memberNumber);
 
+            const entry = entryFromParliamentarian(entries, currentParliamentarian);
+
             const arc = d3.arc()
               .innerRadius(currentRow)
               .outerRadius(currentRow + rowThickness)
               .startAngle(currentAngle)
               .endAngle(currentAngle + perMember);
 
-            halfCircleGroup.append('path')
+            const r = halfCircleGroup.append('path')
               .attr('d', arc)
               .style('fill', member.parlGroupColour)
               .style('cursor', 'pointer')
+              .style('fill-opacity', 0.3)
               .on('mouseover', function (d, i) {
                 setHoverPos([mouseX, mouseY]);
                 setHover(currentParliamentarian);
-                d3.select(this).transition()
-                  .duration(50)
-                  .style('fill-opacity', '.7');
+                // d3.select(this).transition()
+                //   .duration(50)
+                //   .style('fill-opacity', '.7');
               })
               .on('mouseout', function (d, i) {
                 if (cardRef.current &&
@@ -141,11 +174,17 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
 
                 setHover(null);
 
-                d3.select(this).transition()
-                  .duration(50)
-                  .style('fill-opacity', '1');
+                // d3.select(this).transition()
+                //   .duration(50)
+                //   .style('fill-opacity', '1');
               })
               .on('click', () => onSelect(currentParliamentarian));
+
+
+            if (entry) {
+              const score = calculateRelativeInfluenceScore(entries, entry);
+              r.style('fill-opacity', score);
+            }
 
             currentAngle += perMember + memberAngleDistance;
           }
@@ -176,7 +215,7 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
       }
 
     }
-  }, [onSelect, setHover, setHoverPos]);
+  }, [onSelect, setHover, setHoverPos, entries]);
 
   return <>
     <div ref={svgContainer} className="h-[450px] w-full">

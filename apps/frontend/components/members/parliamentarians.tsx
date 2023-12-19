@@ -43,7 +43,6 @@ export const Parliamentarians: FC<ParliamentariansProps> = ({ entries }) => {
   const [selected, setSelected] = useState<[Parliamentarian, ParliamentarianEntry | null] | null>(null);
   const params = useSearchParams();
 
-  console.log(entries);
   useEffect(() => {
     if (!params.get('id')) {
       return;
