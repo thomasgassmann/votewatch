@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Canton {
+  id               String            @id
+  shortName        String            @unique // The shorthand of the canton, ex: ZH
+  name             String // The full name (display name) of the canton, ex: Zürich
+  parliamentarians Parliamentarian[]
+}
+
+model Parliamentarian {
+  id       String @id
+  name     String
+  canton   Canton @relation(fields: [cantonId], references: [id])
+  cantonId String
+  // TODO: other basic information we need?
+
+  // Remark: I wouldn't add the "score" field (for seat color) to the database schema as this is something that we can dynamically calculate
+  // and maybe even support being able to switch between different scoring views
+
+  party   Party  @relation(fields: [partyId], references: [id])
+  partyId String
+
+  relatedOrganizations ParliamentarianRelatedToOrganization[]
+
+  votes      ParliamentarianVote[]
+  committees Committee[]
+  bills      Bill[]
+}
+
+model Party {
+  id String @id
+
+  shortName String // z.B. SP
+  fullName  String // z.B. Sozialdemokratische Partei
+
+  members Parliamentarian[]
+}
+
+model ParliamentarianRelatedToOrganization {
+  parliamentarian   Parliamentarian   @relation(fields: [parliamentarianId], references: [id])
+  parliamentarianId String
+  organization      LobbyOrganization @relation(fields: [organizationId], references: [id])
+  organizationId    String
+
+  position String // Position (title) in organization
+  // TODO: maybe also add an enum that defines the type (overall category) of the position/relation
+
+  influenceLevel InfluenceLevel @default(UNKNOWN)
+
+  verguetung String?
+
+  @@id([parliamentarianId, organizationId])
+}
+
+enum InfluenceLevel {
+  TIEF
+  MITTEL
+  HOCH
+  UNKNOWN
+}
+
+model LobbyOrganization {
+  id         String @id
+  name       String
+  rechtsform String
+
+  interestsGroups         InterestGroup[]
+  connectionsToParliament ParliamentarianRelatedToOrganization[]
+}
+
+// Different topics/causes that organizations belongs to/lobbies for, for example Education
+model InterestGroup {
+  id          String @id
+  name        String
+  description String
+  aliasNames  String // Alternative names for the interest gorups, seperated by ;
+
+  lobbyOrganizations LobbyOrganization[] //@relation(fields: [lobbyOrganizationId], references: [id])
+  //lobbyOrganizationId String?
+}
+
+// Bills that parliament votes on
+model Bill {
+  id         String                @id
+  title      String
+  billText   String
+  sponsor    Parliamentarian       @relation(fields: [sponsorId], references: [id])
+  sponsorId  String
+  voteResult VoteStatus            @default(UNKNOWN)
+  votes      ParliamentarianVote[]
+  // TODO: what is billStatus?
+}
+
+enum VoteStatus {
+  YES
+  NO
+  UNKNOWN
+}
+
+model ParliamentarianVote {
+  parliamentarian   Parliamentarian @relation(fields: [parliamentarianId], references: [id])
+  parliamentarianId String
+  bill              Bill            @relation(fields: [billId], references: [id])
+  billId            String
+
+  voteStatus VoteStatus
+
+  @@id([parliamentarianId, billId])
+}
+
+model Committee {
+  id               String            @id
+  name             String
+  parliamentarians Parliamentarian[]
+}

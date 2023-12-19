@@ -82,6 +82,34 @@ Write here all instructions to build the environment and run your code.\
 Write here **DETAILED** instructions on how to run your code.\
 **NOTE:** If we cannot run your code following these instructions we will not be able to evaluate it.
 
+### Docker
+
+This repo is configured to be built with Docker, and Docker compose. To build all apps in this repo:
+
+TODO: Add missing instructions
+
+```
+# Create a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+docker network create app_network
+
+# Build prod using new BuildKit engine
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yml build
+
+# Start prod in detached mode
+docker-compose -f docker-compose.yml up -d
+```
+
+Open http://localhost:3000.
+
+To shutdown all running containers:
+
+```
+# Stop all running containers
+docker kill $(docker ps -q) && docker rm $(docker ps -a -q)
+```
+
+--- OLD INSTRUCTIONS ---
 As an example here are the instructions to run the Dummy Project:
 To run the Dummy project you have to:
 
@@ -121,6 +149,8 @@ docker build -t my-webapp src/.
 docker run -it --rm -p 5173:5173 my-webapp bash
 ```
 
+---
+
 ## Milestones
 
 Document here the major milestones of your code and future planned steps.\
@@ -158,7 +188,7 @@ Create a merge request (with corresponding branch) from each issue.\
 Finally accept the merge request once issue is resolved. Once you complete a task, link the corresponding merge commit.\
 Take a look at [Issues and Branches](https://www.youtube.com/watch?v=DSuSBuVYpys) for more details.
 
-This will help you have a clearer overview of what you are currently doing, track your progress and organise your work among yourselves. Moreover it gives us more insights on your progress.  
+This will help you have a clearer overview of what you are currently doing, track your progress and organise your work among yourselves. Moreover it gives us more insights on your progress.
 
 ## Weekly Summary
 
