@@ -60,7 +60,7 @@ export const Parliamentarians: FC<ParliamentariansProps> = ({ entries }) => {
   return <>
     <Council onSelect={parliamentarian => {
       setSelected([parliamentarian, entries.find(x => x.lastName + ' ' + x.firstName === parliamentarian.name) ?? null]);
-    }} />
+    }} entries={entries} />
     {selected && <ParliamentarianInfo parliamentarian={selected[0]} entry={selected[1]} />}
   </>
 };

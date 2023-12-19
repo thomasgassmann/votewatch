@@ -2,6 +2,7 @@ import { ParliamentarianEntry, Parliamentarians } from "@/components/members";
 import { PageHeader } from "../../../components/header"
 import { PageShell } from "../../../components/shell"
 import { db } from "@votewatch/database"
+import Link from "next/link";
 
 export const metadata = {
   title: "Parliamentarians",

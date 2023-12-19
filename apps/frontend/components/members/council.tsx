@@ -23,6 +23,7 @@ export type Parliamentarian = {
 
 export type CouncilProps = {
   onSelect(parliamentarian: Parliamentarian): void;
+  entries: ParliamentarianEntry[];
 };
 
 let mouseX, mouseY = 0;
@@ -57,7 +58,7 @@ export const parliamentarianFromSeatsInformation = (number: number): Parliamenta
   };
 };
 
-export const Council: FC<CouncilProps> = ({ onSelect }) => {
+export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const svgContainer = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
