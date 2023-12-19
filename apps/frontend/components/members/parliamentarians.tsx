@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, useEffect, useState } from "react";
-import { Council, Parliamentarian, getSeatNumberFromName, parliamentarianFromSeatsInformation } from "./council";
+import { Council, Parliamentarian, getSeatNumberFromName, parliamentarianFromEntry, parliamentarianFromSeatsInformation } from "./council";
 import { ParliamentarianInfo } from "./parliamentarianInfo";
 import { useSearchParams } from "next/navigation";
 
@@ -40,7 +40,7 @@ export type ParliamentariansProps = {
 };
 
 export const Parliamentarians: FC<ParliamentariansProps> = ({ entries }) => {
-  const [selected, setSelected] = useState<Parliamentarian | null>(null);
+  const [selected, setSelected] = useState<[Parliamentarian, ParliamentarianEntry | null] | null>(null);
   const params = useSearchParams();
 
   console.log(entries);
@@ -54,13 +54,13 @@ export const Parliamentarians: FC<ParliamentariansProps> = ({ entries }) => {
       return;
     }
 
-    const seatNumber = getSeatNumberFromName(selectedEntry.lastName + ' ' + selectedEntry.firstName);
-    const parliamentarian = parliamentarianFromSeatsInformation(seatNumber);
-    setSelected(parliamentarian);
+    setSelected([parliamentarianFromEntry(selectedEntry), selectedEntry]);
   }, [entries, params, setSelected]);
 
   return <>
-    <Council onSelect={setSelected} />
-    {selected && <ParliamentarianInfo parliamentarian={selected} />}
+    <Council onSelect={parliamentarian => {
+      setSelected([parliamentarian, entries.find(x => x.lastName + ' ' + x.firstName === parliamentarian.name) ?? null]);
+    }} />
+    {selected && <ParliamentarianInfo parliamentarian={selected[0]} entry={selected[1]} />}
   </>
 };

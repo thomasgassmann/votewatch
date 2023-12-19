@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button"
 import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs"
 import Link from "next/link"
 import { FC } from "react";
+import { ParliamentarianEntry } from "./parliamentarians";
 
 export type ParliamentarianProps = {
   parliamentarian: Parliamentarian;
+  entry: ParliamentarianEntry | null;
 };
 
-export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian }) => {
+export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian, entry }) => {
   return <main className="lg:flex lg:space-x-10">
     <aside className="lg:w-1/4">
       <Card className="mb-6">
@@ -28,9 +30,12 @@ export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian 
               }}>{parliamentarian.groupName}</Badge>
             </div>
           </div>
-          <p className="text-gray-500 dark:text-gray-400">
-            {parliamentarian.canton}
-          </p>
+          {entry && <p className="text-gray-500 dark:text-gray-400">
+            {entry.canton} - {entry.partyFullName}
+          </p>}
+          {!entry && <p className="text-gray-500 dark:text-gray-400">
+            Lobbywatch does not have any information for this councilor.
+          </p>}
         </CardContent>
       </Card>
       <Link href={parliamentarian.infoUrl}>

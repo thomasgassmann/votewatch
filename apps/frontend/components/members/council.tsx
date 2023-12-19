@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { Badge } from "@/components/ui/badge";
+import { ParliamentarianEntry } from "./parliamentarians";
 
 export type Parliamentarian = {
   number: number;
@@ -36,6 +37,11 @@ if (typeof window !== 'undefined') {
 export const getSeatNumberFromName = (name: string): number => {
   return data.find(x => x.councilorName === name)!.number;
 }
+
+export const parliamentarianFromEntry = (entry: ParliamentarianEntry): Parliamentarian => {
+  const seatNumber = getSeatNumberFromName(entry.lastName + ' ' + entry.firstName);
+  return parliamentarianFromSeatsInformation(seatNumber);
+};
 
 export const parliamentarianFromSeatsInformation = (number: number): Parliamentarian => {
   const member = data.find(x => x.number === number)!;
