@@ -3,7 +3,7 @@
 import { FC, useEffect, useState } from "react";
 import { Council, Parliamentarian, getSeatNumberFromName, parliamentarianFromSeatsInformation } from "./council";
 import { ParliamentarianInfo } from "./parliamentarianInfo";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 
 export type CommitteeEntry = {
   name: string;
@@ -40,18 +40,22 @@ export type ParliamentariansProps = {
 
 export const Parliamentarians: FC<ParliamentariansProps> = ({ entries }) => {
   const [selected, setSelected] = useState<Parliamentarian | null>(null);
-  const router = useRouter();
+  const params = useSearchParams();
 
   useEffect(() => {
-    if (!router.query.id) {
+    if (!params.get('id')) {
       return;
     }
 
-    const selectedEntry = entries.find(x => x.id === router.query.id)!;
+    const selectedEntry = entries.find(x => x.id === params.get('id'));
+    if (!selectedEntry) {
+      return;
+    }
+
     const seatNumber = getSeatNumberFromName(selectedEntry.name);
     const parliamentarian = parliamentarianFromSeatsInformation(seatNumber);
     setSelected(parliamentarian);
-  }, [entries, router.query.id, setSelected]);
+  }, [entries, params, setSelected]);
 
   return <>
     <Council onSelect={setSelected} />
