@@ -25,7 +25,8 @@ export type OrganizationEntry = {
 
 export type ParliamentarianEntry = {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   canton: string;
   committees: CommitteeEntry[];
   bills: BillEntry[];

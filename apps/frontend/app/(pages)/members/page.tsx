@@ -26,7 +26,8 @@ export default async function MembersPage() {
 
   const mps = members.map<ParliamentarianEntry>(x => ({
     id: x.id,
-    name: x.name,
+    firstName: x.firstName,
+    lastName: x.lastName,
     canton: x.canton.name,
     committees: x.committees.map(x => ({
       name: x.name
