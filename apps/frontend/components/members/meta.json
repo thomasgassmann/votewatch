@@ -1,0 +1,48 @@
+{
+  "pieFrom": 13,
+  "pieTo": 200,
+  "rows": [
+    {
+      "firstGroup": 2,
+      "secondGroup": 2,
+      "thirdGroup": 2,
+      "forthGroup": 2
+    },
+    {
+      "firstGroup": 5,
+      "secondGroup": 4,
+      "thirdGroup": 4,
+      "forthGroup": 5
+    },
+    {
+      "firstGroup": 6,
+      "secondGroup": 5,
+      "thirdGroup": 5,
+      "forthGroup": 6
+    },
+    {
+      "firstGroup": 8,
+      "secondGroup": 7,
+      "thirdGroup": 7,
+      "forthGroup": 8
+    },
+    {
+      "firstGroup": 9,
+      "secondGroup": 9,
+      "thirdGroup": 9,
+      "forthGroup": 9
+    },
+    {
+      "firstGroup": 10,
+      "secondGroup": 10,
+      "thirdGroup": 10,
+      "forthGroup": 10
+    },
+    {
+      "firstGroup": 6,
+      "secondGroup": 11,
+      "thirdGroup": 11,
+      "forthGroup": 6
+    }
+  ]
+}

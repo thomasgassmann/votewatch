@@ -1,46 +1,60 @@
-import { ListItem } from "@/components/list-item"
-
+import { ParliamentarianEntry, Parliamentarians } from "@/components/members";
 import { PageHeader } from "../../../components/header"
 import { PageShell } from "../../../components/shell"
 import { db } from "@votewatch/database"
-import { groupBy } from "rambdax"
 
 export const metadata = {
   title: "Parliamentarians",
-  description: "See what the members of Parliament have been up to",
+  description: "See what the members of the national council have been up to",
 }
 
-export default async function BillsOverviewPage() {
+export default async function MembersPage() {
   // Just an example
 
-  const members = groupBy((e) => `${e.party.fullName} (${e.party.shortName})`, await db.parliamentarian.findMany({
+  const members = await db.parliamentarian.findMany({
     include: {
       party: true,
+      relatedOrganizations: true,
+      bills: true,
+      votes: true,
+      committees: true,
+      canton: true
     },
-  }))
+  });
+
+  const organizations = await db.lobbyOrganization.findMany();
+
+  const mps = members.map<ParliamentarianEntry>(x => ({
+    id: x.id,
+    firstName: x.firstName,
+    lastName: x.lastName,
+    canton: x.canton.name,
+    committees: x.committees.map(x => ({
+      name: x.name
+    })),
+    bills: x.bills.map(x => ({
+      title: x.title,
+      billText: x.billText,
+      voteResult: x.voteResult
+    })),
+    partyFullName: x.party.fullName,
+    partyShortName: x.party.shortName,
+    organizations: x.relatedOrganizations.map(x => ({
+      name: organizations.find(p => p.id === x.organizationId)!.name,
+      rechtsform: organizations.find(p => p.id === x.organizationId)!.rechtsform,
+      influenceLevel: x.influenceLevel,
+      vergueting: x.verguetung,
+      position: x.position
+    }))
+  }));
 
   return (
     <PageShell>
       <PageHeader
         heading="Parliamentarians"
-        text="See what the members of Parliament have been up to"
+        text="See what the members of the national council have been up to"
       />
-      <div className="grid gap-10">
-        <div className="rounded-md border">
-          {Object.entries(members).map(entry => <div>
-            <h3>{entry[0]}</h3>
-            <div className="flex w-full divide-x overflow-auto">
-          {entry[1].map((member) => (
-            <ListItem
-              key={member.id}
-              name={member.firstName + ' ' + member.lastName}
-              description={`${member.party.fullName || member.party.shortName}`}
-            />
-          ))}
-          </div></div>)}
-        </div>
-      </div>
-      <pre className="font-mono">{JSON.stringify(members, null, 2)}</pre>
+      <Parliamentarians entries={mps} />
     </PageShell>
   )
 }
