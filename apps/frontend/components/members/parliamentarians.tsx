@@ -54,7 +54,7 @@ export const Parliamentarians: FC<ParliamentariansProps> = ({ entries }) => {
       return;
     }
 
-    const seatNumber = getSeatNumberFromName(selectedEntry.name);
+    const seatNumber = getSeatNumberFromName(selectedEntry.lastName + ' ' + selectedEntry.firstName);
     const parliamentarian = parliamentarianFromSeatsInformation(seatNumber);
     setSelected(parliamentarian);
   }, [entries, params, setSelected]);
