@@ -6,6 +6,8 @@ import { fetchParties } from "./fetchers/party";
 import { fetchParliamentarians } from "./fetchers/parlamentarian";
 import { fetchInterestGroups } from "./fetchers/interestGroups";
 import { fetchLobbyOrganizations } from "./fetchers/organizations";
+import { fetchLobbyConnections } from "./fetchers/lobbyConnections";
+import { fetchCommittees } from "./fetchers/committees";
 
 async function fetch() {
   await fetchCantons();
@@ -13,6 +15,8 @@ async function fetch() {
   await fetchParliamentarians();
   await fetchInterestGroups();
   await fetchLobbyOrganizations();
+  await fetchCommittees();
+  await fetchLobbyConnections();
   await fetchVotes();
 }
 
