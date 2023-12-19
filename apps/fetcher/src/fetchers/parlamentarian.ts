@@ -27,7 +27,8 @@ export async function fetchParliamentarians() {
       update: {},
       create: {
         id: parliamentarian.id,
-        name: `${parliamentarian.vorname} ${parliamentarian.nachname}`,
+        firstName: parliamentarian.vorname,
+        lastName: parliamentarian.nachname,
         cantonId: parliamentarian.kanton_id,
         partyId: parliamentarian.partei_id,
       },

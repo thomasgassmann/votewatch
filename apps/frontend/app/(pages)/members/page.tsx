@@ -33,7 +33,7 @@ export default async function BillsOverviewPage() {
           {entry[1].map((member) => (
             <ListItem
               key={member.id}
-              name={member.name}
+              name={member.firstName + ' ' + member.lastName}
               description={`${member.party.fullName || member.party.shortName}`}
             />
           ))}

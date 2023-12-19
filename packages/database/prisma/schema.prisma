@@ -18,10 +18,11 @@ model Canton {
 }
 
 model Parliamentarian {
-  id       String @id
-  name     String
-  canton   Canton @relation(fields: [cantonId], references: [id])
-  cantonId String
+  id        String @id
+  firstName String
+  lastName  String
+  canton    Canton @relation(fields: [cantonId], references: [id])
+  cantonId  String
   // TODO: other basic information we need?
 
   // Remark: I wouldn't add the "score" field (for seat color) to the database schema as this is something that we can dynamically calculate
