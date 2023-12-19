@@ -5,9 +5,7 @@ import { FC, useEffect, useRef, useState } from "react";
 
 import meta from './meta.json';
 import data from './seats.json';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@radix-ui/react-hover-card";
-import { Popover, PopoverContent } from "@radix-ui/react-popover";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +32,24 @@ if (typeof window !== 'undefined') {
     mouseY = e.pageY;
   });
 }
+
+export const getSeatNumberFromName = (name: string): number => {
+  return data.find(x => x.councilorName === name)!.number;
+}
+
+export const parliamentarianFromSeatsInformation = (number: number): Parliamentarian => {
+  const member = data.find(x => x.number === number)!;
+
+  return {
+    number: member.number,
+    name: member.councilorName,
+    imageUrl: 'https://www.parlament.ch/' + member.councilorPhotoUrl,
+    groupName: member.parlGroupName,
+    groupColor: member.parlGroupColour,
+    infoUrl: 'https://www.parlament.ch' + member.councilorDetailUrl,
+    canton: member.councilorCanton
+  };
+};
 
 export const Council: FC<CouncilProps> = ({ onSelect }) => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -90,16 +106,7 @@ export const Council: FC<CouncilProps> = ({ onSelect }) => {
           let currentAngle = fromAngle;
           for (const memberNumber of currentMembers) {
             const member = data.find(x => x.number === memberNumber)!;
-
-            const currentParliamentarian: Parliamentarian = {
-              number: member.number,
-              name: member.councilorName,
-              imageUrl: 'https://www.parlament.ch/' + member.councilorPhotoUrl,
-              groupName: member.parlGroupName,
-              groupColor: member.parlGroupColour,
-              infoUrl: 'https://www.parlament.ch' + member.councilorDetailUrl,
-              canton: member.councilorCanton
-            };
+            const currentParliamentarian: Parliamentarian = parliamentarianFromSeatsInformation(memberNumber);
 
             const arc = d3.arc()
               .innerRadius(currentRow)

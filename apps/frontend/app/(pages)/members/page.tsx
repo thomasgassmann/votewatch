@@ -25,6 +25,7 @@ export default async function MembersPage() {
   const organizations = await db.lobbyOrganization.findMany();
 
   const mps = members.map<ParliamentarianEntry>(x => ({
+    id: x.id,
     name: x.name,
     canton: x.canton.name,
     committees: x.committees.map(x => ({
@@ -52,7 +53,7 @@ export default async function MembersPage() {
         heading="Parliamentarians"
         text="See what the members of the national council have been up to"
       />
-      <Parliamentarians />
+      <Parliamentarians entries={mps} />
     </PageShell>
   )
 }

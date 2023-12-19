@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from "react";
-import { Council, Parliamentarian } from "./council";
+import { FC, useEffect, useState } from "react";
+import { Council, Parliamentarian, getSeatNumberFromName, parliamentarianFromSeatsInformation } from "./council";
 import { ParliamentarianInfo } from "./parliamentarianInfo";
+import { useRouter } from "next/router";
 
 export type CommitteeEntry = {
   name: string;
@@ -23,6 +24,7 @@ export type OrganizationEntry = {
 };
 
 export type ParliamentarianEntry = {
+  id: string;
   name: string;
   canton: string;
   committees: CommitteeEntry[];
@@ -32,8 +34,25 @@ export type ParliamentarianEntry = {
   organizations: OrganizationEntry[];
 };
 
-export const Parliamentarians = () => {
+export type ParliamentariansProps = {
+  entries: ParliamentarianEntry[];
+};
+
+export const Parliamentarians: FC<ParliamentariansProps> = ({ entries }) => {
   const [selected, setSelected] = useState<Parliamentarian | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!router.query.id) {
+      return;
+    }
+
+    const selectedEntry = entries.find(x => x.id === router.query.id)!;
+    const seatNumber = getSeatNumberFromName(selectedEntry.name);
+    const parliamentarian = parliamentarianFromSeatsInformation(seatNumber);
+    setSelected(parliamentarian);
+  }, [entries, router.query.id, setSelected]);
+
   return <>
     <Council onSelect={setSelected} />
     {selected && <ParliamentarianInfo parliamentarian={selected} />}
