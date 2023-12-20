@@ -1,0 +1,29 @@
+{
+  "name": "Branche1",
+  "children": [
+    {
+      "name": "Partei1",
+      "children": [
+        {
+          "name": "Parlamentarian1",
+          "children": []
+        },
+        {
+          "name": "Parlamentarian2",
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "Partei2",
+      "children": [
+      ]
+    },
+    {
+      "name": "Partei3",
+      "children": [
+      ]
+    }
+  ]
+}
+
