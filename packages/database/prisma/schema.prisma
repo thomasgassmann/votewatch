@@ -95,8 +95,8 @@ model Bill {
   id         String                @id
   title      String
   billText   String
-  sponsor    Parliamentarian       @relation(fields: [sponsorId], references: [id])
-  sponsorId  String
+  sponsor    Parliamentarian?      @relation(fields: [sponsorId], references: [id])
+  sponsorId  String?
   voteResult VoteStatus            @default(UNKNOWN)
   votes      ParliamentarianVote[]
   // TODO: what is billStatus?

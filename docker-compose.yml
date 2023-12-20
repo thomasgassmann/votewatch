@@ -12,30 +12,6 @@ services:
       - ./db:/var/lib/postgresql/data
     ports:
       - 5432:5432
-  # frontend:
-  #   container_name: frontend
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/frontend/Dockerfile
-  #   restart: always
-  #   ports:
-  #     - 3000:3000
-  #   networks:
-  #     - app_network
-
-  # fetcher:
-  #   container_name: api
-  #   build:
-  #     context: .
-  #     dockerfile: ./apps/fetcher/Dockerfile
-  #   restart: always
-  #   ports:
-  #     - 3001:3001
-  #   networks:
-  #     - app_network
-
-# Define a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
 
 volumes:
   votewatch-volume:
