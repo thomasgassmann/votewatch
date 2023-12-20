@@ -5,6 +5,8 @@ export default async function fetchVotes() {
   const acceptedStates = [3, 20, 36];
   const deniedStates = [22, 56, 63];
 
+  const placeholderParlamentarian = await db.parliamentarian.findFirst({});
+
   const data = await swissparl.fetchCollection<swissparl.Session>(
     swissparl.Collection.Session,
     {
@@ -94,14 +96,16 @@ export default async function fetchVotes() {
         id: bill.ID!,
         title: bill.Title!,
         billText: "",
-        //sponsorId: "10", // TODO: FIND THIS SOMEWHERE IN THE DATA
+        // TODO: FIND THIS SOMEWHERE IN THE DATA
+        sponsorId: placeholderParlamentarian?.id,
         voteResult: resolution,
       },
       create: {
         id: bill.ID!,
         title: bill.Title!,
         billText: "",
-        //sponsorId: "10", // TODO: FIND A WAY TO REPLACE THIS???
+        // TODO: FIND A WAY TO REPLACE THIS???
+        sponsorId: placeholderParlamentarian?.id,
         voteResult: resolution,
       },
     });
