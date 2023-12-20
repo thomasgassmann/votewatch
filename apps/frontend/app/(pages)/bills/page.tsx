@@ -76,7 +76,7 @@ export default function BillsPageLoading() {
     <PageShell>
       <PageHeader
         heading="Bills"
-        text="Explore different bills and their lobby influences!!"
+        text="Explore different bills and their lobby influences"
       />
       <h1 className="font-semibold text-2xl">Bill Data Visualization</h1>
       <form className="flex items-center">
@@ -115,8 +115,13 @@ export default function BillsPageLoading() {
               {selectedBill && <BillPie data={voters} />}
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
-              <p className="text-base">Explainer</p>
+              <h3 className="text-lg font-semibold mb-2">Explaination:</h3>
+              <p className="text-base">On this page you can select any bill that has been voted on in parliament in the proceeding legislature.
+              The classification of the influence levels of a bill's sponsor, yes or no voters bases itself on a comparison to the median parliamentarian.
+              A low level indicates significantly fewer special interest connections while a high level indicates significantly more. 
+              The top three standout special interest connections of a parliamentarian are listed in order of how much they influence the given group more 
+              than the median parliamentarian. 
+                </p>
             </div>
           </CardContent>
         </Card>
