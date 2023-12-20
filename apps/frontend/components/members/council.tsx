@@ -1,6 +1,7 @@
 'use client';
 
 import * as d3 from "d3";
+import type { Selection } from 'd3';
 import { FC, useEffect, useRef, useState } from "react";
 
 import meta from './meta.json';
@@ -23,6 +24,7 @@ export type Parliamentarian = {
 
 export type CouncilProps = {
   onSelect(parliamentarian: Parliamentarian): void;
+  entries: ParliamentarianEntry[];
 };
 
 let mouseX, mouseY = 0;
@@ -43,6 +45,10 @@ export const parliamentarianFromEntry = (entry: ParliamentarianEntry): Parliamen
   return parliamentarianFromSeatsInformation(seatNumber);
 };
 
+export const entryFromParliamentarian = (entries: ParliamentarianEntry[], parl: Parliamentarian): ParliamentarianEntry | null => {
+  return entries.find(x => x.lastName + ' ' + x.firstName === parl.name) ?? null;
+}
+
 export const parliamentarianFromSeatsInformation = (number: number): Parliamentarian => {
   const member = data.find(x => x.number === number)!;
 
@@ -57,7 +63,33 @@ export const parliamentarianFromSeatsInformation = (number: number): Parliamenta
   };
 };
 
-export const Council: FC<CouncilProps> = ({ onSelect }) => {
+const countInfluence = (entry: ParliamentarianEntry): number => {
+  let total = 0;
+  for (const org of entry.organizations) {
+    switch (org.influenceLevel) {
+      case 'HOCH':
+        total += 5;
+        break;
+      case 'MITTEL':
+        total += 3;
+        break;
+      case 'TIEF':
+        total += 1;
+      case 'UNKNOWN':
+      default:
+        total += 1;
+    }
+  }
+
+  return total;
+}
+
+const calculateRelativeInfluenceScore = (entries: ParliamentarianEntry[], entry: ParliamentarianEntry): number => {
+  const highest = Math.max(...entries.map(x => countInfluence(x)));
+  return (countInfluence(entry) / highest) * 0.7 + 0.3;
+};
+
+export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const svgContainer = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -88,9 +120,50 @@ export const Council: FC<CouncilProps> = ({ onSelect }) => {
       let rowThickness = 35;
       const rowDistance = 10;
 
-      let members = data.sort((a, b) => a.number - b.number);
+      let bottomRow: number[] = [];
+      let members = [...data].sort((a, b) => a.number - b.number);
       while (members[0].number < meta.pieFrom) {
-        members.shift();
+        bottomRow.push(members.shift()!.number);
+      }
+
+      const setData = (input: Selection<d3.BaseType, unknown, d3.BaseType, unknown>, memberNumber: number) => {
+        const member = data.find(x => x.number === memberNumber)!;
+        const currentParliamentarian: Parliamentarian = parliamentarianFromSeatsInformation(memberNumber);
+
+        const entry = entryFromParliamentarian(entries, currentParliamentarian);
+        const r = input
+          .style('fill', member.parlGroupColour)
+          .style('cursor', 'pointer')
+          .style('fill-opacity', 0.3)
+          .on('mouseover', function (d, i) {
+            setHoverPos([mouseX, mouseY]);
+            setHover(currentParliamentarian);
+          })
+          .on('mouseout', function (d, i) {
+            if (cardRef.current &&
+              cardRef.current.getBoundingClientRect().left <= mouseX && mouseX <= cardRef.current.getBoundingClientRect().right &&
+              cardRef.current.getBoundingClientRect().top <= mouseY && mouseY <= cardRef.current.getBoundingClientRect().bottom) {
+              return;
+            }
+
+            setHover(null);
+          })
+          .on('click', () => onSelect(currentParliamentarian));
+
+        if (entry) {
+          const score = calculateRelativeInfluenceScore(entries, entry);
+          r.style('fill-opacity', score);
+        }
+      };
+
+      let currentX = -16.5 * rowDistance;
+      for (const bottomNumber of bottomRow) {
+        const c = bottomRowGroup.append('circle')
+          .attr('cx', currentX)
+          .attr('cy', - rowDistance * 3)
+          .attr('r', rowDistance);
+        setData(c, bottomNumber);
+        currentX += rowDistance * 3;
       }
 
       let rowNumber = 0;
@@ -111,8 +184,6 @@ export const Council: FC<CouncilProps> = ({ onSelect }) => {
           const perMember = (area - (currentMembers.length - 1) * memberAngleDistance) / currentMembers.length;
           let currentAngle = fromAngle;
           for (const memberNumber of currentMembers) {
-            const member = data.find(x => x.number === memberNumber)!;
-            const currentParliamentarian: Parliamentarian = parliamentarianFromSeatsInformation(memberNumber);
 
             const arc = d3.arc()
               .innerRadius(currentRow)
@@ -120,31 +191,10 @@ export const Council: FC<CouncilProps> = ({ onSelect }) => {
               .startAngle(currentAngle)
               .endAngle(currentAngle + perMember);
 
-            halfCircleGroup.append('path')
-              .attr('d', arc)
-              .style('fill', member.parlGroupColour)
-              .style('cursor', 'pointer')
-              .on('mouseover', function (d, i) {
-                setHoverPos([mouseX, mouseY]);
-                setHover(currentParliamentarian);
-                d3.select(this).transition()
-                  .duration(50)
-                  .style('fill-opacity', '.7');
-              })
-              .on('mouseout', function (d, i) {
-                if (cardRef.current &&
-                    cardRef.current.getBoundingClientRect().left <= mouseX && mouseX <= cardRef.current.getBoundingClientRect().right &&
-                    cardRef.current.getBoundingClientRect().top <= mouseY && mouseY <= cardRef.current.getBoundingClientRect().bottom) {
-                  return;
-                }
+            const r = halfCircleGroup.append('path')
+              .attr('d', arc);
 
-                setHover(null);
-
-                d3.select(this).transition()
-                  .duration(50)
-                  .style('fill-opacity', '1');
-              })
-              .on('click', () => onSelect(currentParliamentarian));
+            setData(r, memberNumber);
 
             currentAngle += perMember + memberAngleDistance;
           }
@@ -173,9 +223,8 @@ export const Council: FC<CouncilProps> = ({ onSelect }) => {
         currentRow += rowDistance + rowThickness;
         rowNumber++;
       }
-
     }
-  }, [onSelect, setHover, setHoverPos]);
+  }, [onSelect, setHover, setHoverPos, entries]);
 
   return <>
     <div ref={svgContainer} className="h-[450px] w-full">

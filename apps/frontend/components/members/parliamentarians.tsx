@@ -43,7 +43,6 @@ export const Parliamentarians: FC<ParliamentariansProps> = ({ entries }) => {
   const [selected, setSelected] = useState<[Parliamentarian, ParliamentarianEntry | null] | null>(null);
   const params = useSearchParams();
 
-  console.log(entries);
   useEffect(() => {
     if (!params.get('id')) {
       return;
@@ -60,7 +59,7 @@ export const Parliamentarians: FC<ParliamentariansProps> = ({ entries }) => {
   return <>
     <Council onSelect={parliamentarian => {
       setSelected([parliamentarian, entries.find(x => x.lastName + ' ' + x.firstName === parliamentarian.name) ?? null]);
-    }} />
+    }} entries={entries} />
     {selected && <ParliamentarianInfo parliamentarian={selected[0]} entry={selected[1]} />}
   </>
 };
