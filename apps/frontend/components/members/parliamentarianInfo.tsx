@@ -115,10 +115,10 @@ export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian,
         <TabsContent className="p-1" value="votes">
           {
             entry && entry.bills.map(x =>
-              <div key={x.title} className="mb-4">
-                <h3 className="text-lg font-semibold">{x.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{x.billText}</p>
-                <p className="text-blue-500 underline">{x.voteResult}</p>
+              <div key={x.title} className="mb-4 block">
+                <h3 className="mr-2 inline text-lg font-semibold">{x.title}</h3>
+                {/*<p className="text-sm text-gray-500 dark:text-gray-400">{x.billText}</p>*/}
+                <Badge className="inline">{x.voteResult}</Badge>
               </div>)
           }
           {

@@ -17,7 +17,11 @@ export default async function MembersPage() {
       party: true,
       relatedOrganizations: true,
       bills: true,
-      votes: true,
+      votes: {
+        include: {
+          bill: true,
+        }
+      },
       committees: true,
       canton: true
     },
@@ -33,10 +37,10 @@ export default async function MembersPage() {
     committees: x.committees.map(x => ({
       name: x.name
     })),
-    bills: x.bills.map(x => ({
-      title: x.title,
-      billText: x.billText,
-      voteResult: x.voteResult
+    bills: x.votes.map(v => ({
+      title: v.bill.title,
+      billText: "",
+      voteResult: v.voteStatus
     })),
     partyFullName: x.party.fullName,
     partyShortName: x.party.shortName,
