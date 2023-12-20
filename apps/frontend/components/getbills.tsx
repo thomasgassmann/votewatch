@@ -1,5 +1,5 @@
 "use server"
-import { db } from "@/lib/db";
+import { db } from "@votewatch/database";
 
 export async function loadbills() {
   "use server";
