@@ -12,11 +12,11 @@ export async function loadbills() {
         },
       },
     });
-  
+
     return bills;
   }
 
-  
+
     export async function loadBillById(id: string) {
       "use server";
         const bill = await db.bill.findUnique({
@@ -44,11 +44,11 @@ export async function loadBillVoteresbyid(id: string) {
         },
       },
     });
-    
+
     if (!bill) {
       throw new Error(`Bill with id ${id} not found.`);
     }
-  
+
     const yesVotersIds = bill.votes.filter(vote => vote.voteStatus === 'YES').map(vote => vote.parliamentarianId);
     const noVotersIds = bill.votes.filter(vote => vote.voteStatus === 'NO').map(vote => vote.parliamentarianId);
     const abstainVotersIds = bill.votes.filter(vote => vote.voteStatus === 'UNKNOWN').map(vote => vote.parliamentarianId);
@@ -60,9 +60,9 @@ export async function getAllParliamentarians(){
   return await db.parliamentarian.findMany();
 }
 
-export async function getParliamentarianById(id: string){
+export async function getParliamentarianById(id: string | null){
   if (!id){
-    db.parliamentarian.findFirst();
+    return db.parliamentarian.findFirst();
   }
   return db.parliamentarian.findUnique({
     where: { id: id },
