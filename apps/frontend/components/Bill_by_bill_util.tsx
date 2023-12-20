@@ -1,9 +1,9 @@
-// @ts-nocheck
-
+//@ts-nocheck
 import { $Enums, PrismaClient } from '@prisma/client';
 import React, { useEffect, useRef } from 'react';
 import {loadBillVoteresbyid, loadBillById, getAllParliamentarians, getParliamentarianById} from './getbills';
 import * as d3 from 'd3';
+
 
 const prisma = new PrismaClient();
 
@@ -76,8 +76,8 @@ async function calculateBillmaps(billId: string): Promise<[Map<string, number>, 
 
     for (const parliamentarianId of yesVotersIds) {
         const scoreMap = await scoreParliamentarian(parliamentarianId);
-        for (const [organization, score] of scoreMap.entries()) {
-            if (yesVotersScoremap.has(organization)) {
+        for (const [organization, score] of Array.from(scoreMap.entries())) {
+            if (yesVotersScoremap.has(organization) && yesVotersScoremap.get(organization) != null) {
                 const currentscore = yesVotersScoremap.get(organization);
                 yesVotersScoremap.set(organization, currentscore + score);
             } else {
@@ -87,7 +87,7 @@ async function calculateBillmaps(billId: string): Promise<[Map<string, number>, 
     }
     for (const parliamentarianId of noVotersIds) {
         const scoreMap = await scoreParliamentarian(parliamentarianId);
-        for (const [organization, score] of scoreMap.entries()) {
+        for (const [organization, score] of Array.from(scoreMap.entries())) {
             if (noVotersScoremap.has(organization)) {
                 const currentscore = noVotersScoremap.get(organization);
                 noVotersScoremap.set(organization, currentscore + score);
@@ -242,7 +242,7 @@ export async function getaveragemapping(): Promise<{ averagemap: Map<string, num
     let totalScore = 0; // Initialize total score for each parliamentarian
 
     // go through the score map, and add the scores to the average map
-    for (const [organization, score] of scoreMap.entries()) {
+    for (const [organization, score] of Array.from(scoreMap.entries())) {
       if (averagemap.has(organization)) {
         const currentscore = averagemap.get(organization);
         averagemap.set(organization, currentscore + score);
@@ -258,7 +258,7 @@ export async function getaveragemapping(): Promise<{ averagemap: Map<string, num
     }
 
     // divide all the scores by the number of parliamentarians
-    for (const [organization, score] of averagemap.entries()) {
+    for (const [organization, score] of Array.from(averagemap.entries())) {
       averagemap.set(organization, score / parliamentarians.length);
     }
   }
@@ -272,7 +272,7 @@ export function computeanomaly(VotersScoremap: Map<string, number>, averagemap: 
     // do the anomaly computation
     const anomaly = new Map<string, number>();
     var anomalyvalue = 0;
-    for (const [organization, score] of VotersScoremap.entries()) {
+    for (const [organization, score] of Array.from(VotersScoremap.entries())) {
         const average = averagemap.get(organization);
         if (!average) {
             anomalyvalue = 0;
@@ -283,7 +283,7 @@ export function computeanomaly(VotersScoremap: Map<string, number>, averagemap: 
     }
 
     //sort the anomaly map
-    const sortedanomaly = new Map([...anomaly.entries()].sort((a, b) => b[1] - a[1]));
+    const sortedanomaly = new Map([...Array.from(anomaly.entries())].sort((a, b) => b[1] - a[1]));
     //return the anomaly map
     return sortedanomaly;
 }
@@ -292,7 +292,7 @@ export async function getallTop3(sponsorId: string, yesVotersIds: string[], noVo
     const averagemapping = await getaveragemapping()
     const averagemap =  averagemapping.averagemap;
     var averagescore =0;
-    for (const [organization, score] of averagemap.entries()) {
+    for (const [organization, score] of Array.from(averagemap.entries())) {
         averagescore += score;
     }
     averagescore = averagescore/averagemap.size;
@@ -313,7 +313,7 @@ export async function getallTop3(sponsorId: string, yesVotersIds: string[], noVo
     const yesVotersMap = new Map<string, number>();
     for (const voterId of yesVotersIds) {
       const voterMap = await scoreParliamentarian(voterId);
-      for (const [organization, score] of voterMap.entries()) {
+      for (const [organization, score] of Array.from(voterMap.entries())) {
         if (yesVotersMap.has(organization)) {
           const currentScore = yesVotersMap.get(organization);
           yesVotersMap.set(organization, currentScore + score);
@@ -323,12 +323,12 @@ export async function getallTop3(sponsorId: string, yesVotersIds: string[], noVo
       }
     }
     //divide the yesVotersMap by the number of yesVoters
-    for (const [organization, score] of yesVotersMap.entries()) {
+    for (const [organization, score] of Array.from(yesVotersMap.entries())) {
       yesVotersMap.set(organization, score / yesVotersIds.length);
     }
     //calculate the total score of yesVoters by iterating through the yesVotersMap
     var yesVotersScore = 0;
-    for (const [organization, score] of yesVotersMap.entries()) {
+    for (const [organization, score] of Array.from(yesVotersMap.entries())) {
       yesVotersScore += score;
     }
     var yesVotersClassification = "Low";
@@ -344,7 +344,7 @@ export async function getallTop3(sponsorId: string, yesVotersIds: string[], noVo
     const noVotersMap = new Map<string, number>();
     for (const voterId of noVotersIds) {
       const voterMap = await scoreParliamentarian(voterId);
-      for (const [organization, score] of voterMap.entries()) {
+      for (const [organization, score] of Array.from(voterMap.entries())) {
         if (noVotersMap.has(organization)) {
           const currentScore = noVotersMap.get(organization);
           noVotersMap.set(organization, currentScore + score);
@@ -354,12 +354,12 @@ export async function getallTop3(sponsorId: string, yesVotersIds: string[], noVo
       }
     }
     //divide the yesVotersMap by the number of yesVoters
-    for (const [organization, score] of noVotersMap.entries()) {
+    for (const [organization, score] of Array.from(noVotersMap.entries())) {
       yesVotersMap.set(organization, score / yesVotersIds.length);
     }
     //calculate the total score of yesVoters
     var noVotersScore = 0;
-    for (const [organization, score] of noVotersMap.entries()) {
+    for (const [organization, score] of Array.from(noVotersMap.entries())) {
       noVotersScore += score;
     }
 
@@ -410,14 +410,14 @@ export async function makevotesbar(billId: string): Promise<string> {
     const anomalymap = computeanomaly(yesVotersScoremap, averagemap);
     let sum = 0;
     let i = 0;
-    for (const [organization, score] of anomalymap.entries()) {
+    for (const [organization, score] of Array.from(anomalymap.entries())) {
       if (i < 5) {
         sum += score;
       }
       i++;
     }
     let total = 0;
-    for (const [organization, score] of anomalymap.entries()) {
+    for (const [organization, score] of Array.from(anomalymap.entries())) {
       total += Math.abs(score);
     }
     const data = [sum, total];
@@ -433,14 +433,14 @@ export async function makevotesbar(billId: string): Promise<string> {
     const anomalymap = computeanomaly(noVotersScoremap, averagemap);
     let sum = 0;
     let i = 0;
-    for (const [organization, score] of anomalymap.entries()) {
+    for (const [organization, score] of Arrays.from(anomalymap.entries())) {
       if (i < 5) {
         sum += score;
       }
       i++;
     }
     let total = 0;
-    for (const [organization, score] of anomalymap.entries()) {
+    for (const [organization, score] of Arrays.from(anomalymap.entries())) {
       total += Math.abs(score);
     }
     const data = [sum, total];

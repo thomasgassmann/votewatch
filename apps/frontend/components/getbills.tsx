@@ -69,3 +69,10 @@ export async function getParliamentarianById(id: string | null){
     include: { relatedOrganizations: true },
   })
 };
+
+//load organization by id
+export async function getOrganizationById(id: string){
+  return db.lobbyOrganization.findUnique({
+    where: { id: id },
+  })
+};
