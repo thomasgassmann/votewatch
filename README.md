@@ -29,10 +29,6 @@ See the [references section](pitch.md#references) of pitch.
 
 **primarily responsible:** Marc
 
-**points to note:**
-
-- ...
-
 #### Lobbying Dynamics (Visualization)
 
 **high-level idea:** Visualize the lobbying organizations as network diagram. That is visualizing the influence that organizations have on each other as well as on the different political parties.
@@ -77,6 +73,8 @@ See the [references section](pitch.md#references) of pitch.
 Write here all instructions to build the environment and run your code.\
 **NOTE:** If we cannot run your code following these requirements we will not be able to evaluate it.
 
+We are using a monorepo based on `turbo`. As a package manager we're using `pnpm`. A `postgres` database is required to store the imported data which is aggregated from LobbyWatch and the Swiss parliament.
+
 ## How to Run
 
 Write here **DETAILED** instructions on how to run your code.\
@@ -84,72 +82,29 @@ Write here **DETAILED** instructions on how to run your code.\
 
 ### Docker
 
-This repo is configured to be built with Docker, and Docker compose. To build all apps in this repo:
+This repo is configured to be built with Docker. To build all apps in this repo:
 
-TODO: Add missing instructions
-
-```
-# Create a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
-docker network create app_network
-
-# Build prod using new BuildKit engine
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yml build
-
-# Start prod in detached mode
-docker-compose -f docker-compose.yml up -d
+```bash
+docker build . -t votewatch
 ```
 
-Open http://localhost:3000.
+To run the built image:
 
-To shutdown all running containers:
+````bash
+docker run -it votewatch
+````
 
-```
-# Stop all running containers
-docker kill $(docker ps -q) && docker rm $(docker ps -a -q)
-```
+Upon running the app, the database will be initialized by the fetcher (`apps/fetcher`).
 
---- OLD INSTRUCTIONS ---
-As an example here are the instructions to run the Dummy Project:
-To run the Dummy project you have to:
-
-- clone the repository;
-- open a terminal instance and using the command `cd` move to the folder where the project has been downloaded;
-- then run:
+Open http://localhost:5173.
 
 ### Local Development
 
-Only change files inside the `src` directory.
-
-**Client side**
-
-All client side files are located in the `src/client` directory.
-
-**Server side**
-
-All server side files are located in the `src/server` directory.
-
-### Local Testing
-
-**run container for local testing**
-
-```bash
-docker build -t my-webapp .
-
-docker run -it --rm -p 5173:5173 my-webapp
-```
-
-Open a browser and connect to <http://localhost:5173>
-
-**run bash in interactive container**
-
-```bash
-docker build -t my-webapp src/.
-
-docker run -it --rm -p 5173:5173 my-webapp bash
-```
-
----
+1. Run `pnpm install` in the root directory.
+2. Run `docker compose up` in a separate terminal to start the database. All `.env` files should have already been configured.
+3. Run `pnpm run db:generate` as well as `pnpm run db:push` in  `packages/database` to generate the database schema.
+4. Run `pnpm run start` in `packages/fetcher` to execute the fetcher script against the database. This will populate the database with data aggregated from LobbyWatch and the Swiss parliament.
+5. Run `pnpm run dev` in `apps/frontend` to start the NextJS development server.
 
 ## Milestones
 
@@ -165,16 +120,16 @@ Document here the major milestones of your code and future planned steps.\
   - [x] data requirements: lobbying dynamics mockup
   - [x] data requirements: parliamentarian pie mockup
   - [x] design: backend
-- [ ] Milestone 3
-  - [ ] preliminary implementation: bill-by-bill
-  - [ ] preliminary implementation: lobbying dynamics
-  - [ ] preliminary implementation: parliamentarian pie
-  - [ ] preliminary implementation: backend
-- [ ] Milestone 4
-  - [ ] integration: backend with bill-by-bill
-  - [ ] integration: backend with lobbying dynamics
-  - [ ] integration: backend with parliamentarian pie
-  - [ ] implementation: frontend
+- [x] Milestone 3
+  - [x] preliminary implementation: bill-by-bill
+  - [x] preliminary implementation: lobbying dynamics
+  - [x] preliminary implementation: parliamentarian pie
+  - [x] preliminary implementation: backend
+- [x] Milestone 4
+  - [x] integration: backend with bill-by-bill
+  - [x] integration: backend with lobbying dynamics
+  - [x] integration: backend with parliamentarian pie
+  - [x] implementation: frontend
 - [ ] Milestone 5
   - [ ] integration: frontend with bill-by-bill
   - [ ] integration: frontend with lobbying dynamics
@@ -219,17 +174,8 @@ Milestones 1 & 2 are finished. Furhter steps were disucssed:
 - Project progress meeting was held on 14th of December
 - Data schema created, postgres database and data access up and running
 
-## Versioning
+### Week 5
 
-Create stable versions of your code each week by using gitlab tags.\
-Take a look at [Gitlab Tags](https://docs.gitlab.com/ee/topics/git/tags.html) for more details.
-
-Then list here the weekly tags. \
-We will evaluate your code every week, based on the corresponding version.
-
-Tags:
-
-- Milestone 1: ...
-- Milestone 2: ...
-- Milestone 3: ...
-- ...
+- Worked on the visualizations
+- Data import and aggregation
+- Integrate different visualizations into app
