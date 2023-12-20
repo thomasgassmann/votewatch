@@ -1,0 +1,106 @@
+{
+  "nodes": [
+    { "id":  1, "name": "Branche 1",        "category": "branch" },
+    { "id":  2, "name": "aBranche 2",       "category": "branch" },
+    { "id":  3, "name": "zasBranche 3",      "category": "branch" },
+    { "id":  4, "name": "asdBranche 4",     "category": "branch" },
+    { "id":  5, "name": "asdfBranche 5",    "category": "branch" },
+    { "id":  6, "name": "asdBranche 6",     "category": "branch" },
+    { "id":  7, "name": "asBranche 7",      "category": "branch" },
+    { "id":  8, "name": "zOrgansation 1",    "category": "org" },
+    { "id":  9, "name": "Organsation 2",    "category": "org" },
+    { "id": 10, "name": "Organsation 3",    "category": "org" },
+    { "id": 11, "name": "Organsation 4",    "category": "org" },
+    { "id": 12, "name": "Partei 1",         "category": "party" },
+    { "id": 13, "name": "Partei 2a",        "category": "party" },
+    { "id": 14, "name": "Partei 3dsa",      "category": "party" },
+    { "id": 15, "name": "Partei 4sd",       "category": "party" },
+    { "id": 16, "name": "Partei 5d",        "category": "party" },
+    { "id": 17, "name": "Parlamentarier 1", "category": "parl" },
+    { "id": 18, "name": "Parlamentarier 2", "category": "parl" },
+    { "id": 19, "name": "Parlamentarier 3", "category": "parl" },
+    { "id": 20, "name": "Organsation 5",    "category": "org" },
+    { "id": 21, "name": "Organsation 6",    "category": "org" },
+    { "id": 22, "name": "Organsation 7",    "category": "org" },
+    { "id": 23, "name": "Organsation 8",    "category": "org" },
+    { "id": 24, "name": "Parlamentarier 4", "category": "parl" },
+    { "id": 25, "name": "Parlamentarier 5", "category": "parl" },
+    { "id": 26, "name": "Parlamentarier 6", "category": "parl" },
+    { "id": 27, "name": "Parlamentarier 7", "category": "parl" },
+    { "id": 28, "name": "Parlamentarier 8", "category": "parl" }
+  ],
+  "party2parl_idtrees": [
+      {
+          "root_id": 12,
+          "children_id": [
+              17, 18, 19
+          ]
+      },
+      {
+          "root_id": 13,
+          "children_id": []
+      },
+      {
+          "root_id": 14,
+          "children_id": []
+      },
+      {
+          "root_id": 15,
+          "children_id": []
+      },
+      {
+          "root_id": 16,
+          "children_id": []
+      },
+      {
+          "root_id": 16,
+          "children_id": [
+              24, 25, 26, 27, 28
+          ]
+      }
+  ],
+  "branch2org_idtrees": [
+      {
+          "root_id":  1,
+          "children_id": []
+      },
+      {
+          "root_id":  2,
+          "children_id": []
+      },
+      {
+          "root_id": 3,
+          "children_id": [
+              8, 9, 10, 11
+          ]
+      },
+      {
+          "root_id": 4,
+          "children_id": [
+              20, 21, 22, 23
+          ]
+      },
+      {
+          "root_id":  5,
+          "children_id": []
+      },
+      {
+          "root_id":  6,
+          "children_id": []
+      },
+      {
+          "root_id":  7,
+          "children_id": []
+      }
+  ],
+  "branch2party_edges": [
+      { "source":  1, "target": 13 },
+      { "source":  3, "target": 12 },
+      { "source":  3, "target": 16 },
+      { "source":  4, "target": 12 },
+      { "source":  4, "target": 15 },
+      { "source":  4, "target": 16 },
+      { "source":  6, "target": 14 },
+      { "source":  6, "target": 14 }
+  ]
+}

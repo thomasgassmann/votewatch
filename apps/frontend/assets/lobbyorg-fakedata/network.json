@@ -1,0 +1,41 @@
+{
+  "nodes": [
+    { "id":  1, "name": "Branche 1",        "category": "branch" },
+    { "id":  2, "name": "aBranche 2",       "category": "branch" },
+    { "id":  3, "name": "asBranche 3",      "category": "branch" },
+    { "id":  4, "name": "asdBranche 4",     "category": "branch" },
+    { "id":  5, "name": "asdfBranche 5",    "category": "branch" },
+    { "id":  6, "name": "asdBranche 6",     "category": "branch" },
+    { "id":  7, "name": "asBranche 7",      "category": "branch" },
+    { "id":  8, "name": "Organsation 1",    "category": "org" },
+    { "id":  9, "name": "Organsation 2",    "category": "org" },
+    { "id": 10, "name": "Organsation 3",    "category": "org" },
+    { "id": 11, "name": "Organsation 4",    "category": "org" },
+    { "id": 12, "name": "Partei 1",         "category": "party" },
+    { "id": 13, "name": "Partei 2a",        "category": "party" },
+    { "id": 14, "name": "Partei 3dsa",      "category": "party" },
+    { "id": 15, "name": "Partei 4sd",       "category": "party" },
+    { "id": 16, "name": "Partei 5d",        "category": "party" },
+    { "id": 17, "name": "Parlamentarier 1", "category": "parl" },
+    { "id": 18, "name": "Parlamentarier 2", "category": "parl" },
+    { "id": 19, "name": "Parlamentarier 3", "category": "parl" }
+  ],
+  "links": [
+      { "source":  1, "target": 13 },
+      { "source":  1, "target":  8 },
+      { "source":  3, "target": 12 },
+      { "source":  3, "target": 16 },
+      { "source":  4, "target": 12 },
+      { "source":  4, "target": 15 },
+      { "source":  4, "target": 16 },
+      { "source":  4, "target":  9 },
+      { "source":  4, "target": 10 },
+      { "source":  4, "target": 11 },
+      { "source":  6, "target": 14 },
+      { "source":  6, "target": 14 },
+      { "source": 12, "target": 17 },
+      { "source": 12, "target": 17 },
+      { "source": 14, "target": 18 },
+      { "source": 14, "target": 19 }
+  ]
+}
