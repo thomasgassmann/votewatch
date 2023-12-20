@@ -53,7 +53,7 @@ export default async function MembersPage() {
     <PageShell>
       <PageHeader
         heading="Parliamentarians"
-        text="See what the members of the national council have been up to"
+        text="See what the members of the national council have been up to. Each dot or square represents one member of the national council, the color strength represents the connectedness with various lobbying groups, the color itself represents the parliamentary group."
       />
       <Parliamentarians entries={mps} />
     </PageShell>
