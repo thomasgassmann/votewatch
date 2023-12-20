@@ -61,8 +61,11 @@ export async function getAllParliamentarians(){
 }
 
 export async function getParliamentarianById(id: string){
+  if (!id){
+    db.parliamentarian.findFirst();
+  }
   return db.parliamentarian.findUnique({
-    where: { id: id.toString() },
+    where: { id: id },
     include: { relatedOrganizations: true },
   })
 };
