@@ -273,7 +273,6 @@ export function computeanomaly(VotersScoremap: Map<string, number>, averagemap: 
     for (const [organization, score] of VotersScoremap.entries()) {
         const average = averagemap.get(organization);
         if (!average) {
-            throw new Error(`Organization ${organization} not found in average map.`);
             anomalyvalue = 0;
         }else{
           anomalyvalue = score - average;
