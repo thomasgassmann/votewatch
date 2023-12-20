@@ -19,10 +19,10 @@ export default async function fetchVotes() {
     .map((vote) => vote?.ID);
 
   console.log(voteIds);
-  console.log(
-    "Filters",
-    voteIds.map((id) => ({ ID: id as number })),
-  );
+  // console.log(
+  //   "Filters",
+  //   voteIds.map((id) => ({ ID: id as number })),
+  // );
 
   // Refetch so we can get the actual "votings" objects
 
@@ -44,10 +44,10 @@ export default async function fetchVotes() {
     const parliamentarianVotes = (votes[0].Votings as any)
       .results as swissparl.Voting[];
 
-    console.log(`======= ${id} =========`);
-    console.log(votes);
-    console.log("----");
-    console.log(votes[0].Votings?.results.length);
+    // console.log(`======= ${id} =========`);
+    // console.log(votes);
+    // console.log("----");
+    // console.log(votes[0].Votings?.results.length);
 
     const bills = await swissparl.fetchCollection<swissparl.Bill>("Bill", {
       filter: {
@@ -70,17 +70,6 @@ export default async function fetchVotes() {
       continue;
     }
 
-    // const resolution =
-    //   ResolutionAcceptanceStatus[
-    //     // @ts-ignore
-    //     bill.Resolutions.results.find(
-    //       // @ts-ignore
-    //       (x) =>
-    //         x.ResolutionId === ResolutionAcceptanceStatus.ACCEPTED ||
-    //         x.ResolutionId === ResolutionAcceptanceStatus.DENIED,
-    //     )?.ResolutionId
-    //   ];
-
     // @ts-ignore
     const resolutionId = bill.Resolutions.results.find(
       // @ts-ignore
@@ -97,22 +86,6 @@ export default async function fetchVotes() {
       continue;
     }
 
-    console.log("xxx", bill);
-
-    console.log("=======================");
-
-    const x = {
-      id: bill.ID,
-      title: bill.Title,
-      sponsorId: "10", // TODO: FIND A WAY TO REPLACE THIS???
-      voteResult: resolution,
-      // resolution === "ACCEPTED"
-      //   ? "YES"
-      //   : resolution === "DENIED"
-      //     ? "NO"
-      //     : "UNKNOWN",
-    };
-
     await db.bill.upsert({
       where: {
         id: bill.ID,
@@ -121,13 +94,8 @@ export default async function fetchVotes() {
         id: bill.ID!,
         title: bill.Title!,
         billText: "",
-        //sponsorId: "10", // TODO: FIND A WAY TO REPLACE THIS???
+        //sponsorId: "10", // TODO: FIND THIS SOMEWHERE IN THE DATA
         voteResult: resolution,
-        // resolution === "ACCEPTED"
-        //   ? "YES"
-        //   : resolution === "DENIED"
-        //     ? "NO"
-        //     : "UNKNOWN",
       },
       create: {
         id: bill.ID!,
@@ -135,24 +103,10 @@ export default async function fetchVotes() {
         billText: "",
         //sponsorId: "10", // TODO: FIND A WAY TO REPLACE THIS???
         voteResult: resolution,
-        // resolution === "ACCEPTED"
-        //   ? "YES"
-        //   : resolution === "DENIED"
-        //     ? "NO"
-        //     : "UNKNOWN",
       },
     });
 
-    console.log("Votes ", parliamentarianVotes);
-
     for (const parliamentarianVote of parliamentarianVotes!) {
-      /*console.log(
-        "First name: ",
-        parliamentarianVote.FirstName,
-        "L: ",
-        parliamentarianVote.LastName,
-      );*/
-
       // Fetch parliamentarian with name
       const parlamentarian = await db.parliamentarian.findFirst({
         where: {
@@ -179,7 +133,6 @@ export default async function fetchVotes() {
                 },
               },
               create: {
-                // parliamentarianId: parlamentarian!.id,
                 parliamentarianId: parlamentarian!.id,
                 voteStatus:
                   parliamentarianVote.DecisionText === "Ja"
@@ -193,24 +146,11 @@ export default async function fetchVotes() {
         },
       });
     }
-
-    // TODO DEV ONLY
-    //count++;
-    //if (count > 3) break;
   }
-
-  //console.log(votes[0].Votings);
-  //console.log(JSON.stringify(data, null, 2));
 
   if (!data) {
-    throw Error("⛔️ Failed to fetch bills");
+    throw Error("⛔️ Failed to fetch bills and votes");
   }
 
-  for (const bill of data) {
-    const result = {
-      id: bill.ID,
-    };
-  }
-
-  console.log(`🟢 Fetched ${data.length} votes`);
+  console.log(`🟢 Finished fetching bills and votes`);
 }
