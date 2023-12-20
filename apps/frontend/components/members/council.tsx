@@ -133,6 +133,8 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
         const entry = entryFromParliamentarian(entries, currentParliamentarian);
         const r = input
           .style('fill', member.parlGroupColour)
+          .style('cursor', 'pointer')
+          .style('fill-opacity', 0.3)
           .on('mouseover', function (d, i) {
             setHoverPos([mouseX, mouseY]);
             setHover(currentParliamentarian);
@@ -190,9 +192,7 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
               .endAngle(currentAngle + perMember);
 
             const r = halfCircleGroup.append('path')
-              .attr('d', arc)
-              .style('cursor', 'pointer')
-              .style('fill-opacity', 0.3);
+              .attr('d', arc);
 
             setData(r, memberNumber);
 
