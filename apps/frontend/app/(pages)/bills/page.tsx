@@ -5,7 +5,7 @@ import { PageHeader } from '../../../components/header';
 import { getallTop3 } from '../../../components/Bill_by_bill_util';
 import { useState, useEffect } from 'react';
 import { Bill } from '@prisma/client';
-import { loadbills, getParliamentarianById, loadBillVoteresbyid } from '../../../components/getbills';
+import { loadbills, getParliamentarianById, loadBillVoteresbyid, getOrganizationById } from '../../../components/getbills';
 import { CardHeader, CardContent, Card } from "@/components/ui/card"
 import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -53,16 +53,30 @@ export default function BillsPageLoading() {
       }
       const top3 = await getallTop3(sponsorref.id, votersResult[0], votersResult[1])
 
+      const sponsortop3 = String[3];
+      const yestop3 = String[3];
+      const notop3 = String[3]
+
+      //iterate through top3 and get names from ids
+      for (let i = 0; i < 3; i++) {
+        const sponsor = (await getOrganizationById(top3[1][i]))?.name;
+        const yes = (await getOrganizationById(top3[3][i]))?.name;
+        const no = (await getOrganizationById(top3[5][i]))?.name;
+        //save them to the new array
+        sponsortop3[i] = sponsor;
+        yestop3[i] = yes;
+        notop3[i] = no;
+      }
+
       setSelectedBill(selected || null);
       setSponsorname(sponsorref.name);
       setVoters(votersResult);
-      console.log(top3);
       setSponsorclass(top3[0] as string);
-      setSponsorTop3(top3[1] as string[]);
+      setSponsorTop3(sponsorTop3);
       setYesclass(top3[2] as string);
-      setYesTop3(top3[3] as string[]);
+      setYesTop3(yesTop3);
       setNoclass(top3[4] as string);
-      setNoTop3(top3[5] as string[]);
+      setNoTop3(noTop3);
     }
   };
 
