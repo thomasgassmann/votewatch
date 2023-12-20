@@ -55,7 +55,7 @@ export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian,
           <div className="mb-4">
             <h3 className="text-lg font-semibold">Organization 1</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Details about Organization 1's lobbying activities.
+              Details about Organization 1s lobbying activities.
             </p>
             <Link className="text-blue-500 underline" href="#">
               Learn More
