@@ -1,17 +1,45 @@
 import { Parliamentarian } from "./council";
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { CardContent, Card } from "@/components/ui/card"
+import { CardContent, Card, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs"
 import Link from "next/link"
 import { FC } from "react";
-import { ParliamentarianEntry } from "./parliamentarians";
+import { OrganizationEntry, ParliamentarianEntry } from "./parliamentarians";
 
 export type ParliamentarianProps = {
   parliamentarian: Parliamentarian;
   entry: ParliamentarianEntry | null;
 };
+
+const influenceLevelToNumeric = (level: Pick<OrganizationEntry, 'influenceLevel'>['influenceLevel']): number => {
+  switch (level) {
+    case 'HOCH':
+      return 3;
+    case 'MITTEL':
+      return 2;
+    case 'TIEF':
+      return 1;
+    case 'UNKNOWN':
+    default:
+      return 0;
+  }
+}
+
+const influenceLevelToColor = (level: Pick<OrganizationEntry, 'influenceLevel'>['influenceLevel']): string => {
+  switch (level) {
+    case 'HOCH':
+      return '#FF5733';
+    case 'MITTEL':
+      return '#3498DB';
+    case 'TIEF':
+      return '#27AE60';
+    case 'UNKNOWN':
+    default:
+      return '#848484';
+  }
+}
 
 export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian, entry }) => {
   return <main className="lg:flex lg:space-x-10">
@@ -52,33 +80,60 @@ export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian,
           <TabsTrigger value="committees">Committees</TabsTrigger>
         </TabsList>
         <TabsContent className="p-1" value="lobbying">
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Organization 1</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Details about Organization 1s lobbying activities.
-            </p>
-            <Link className="text-blue-500 underline" href="#">
-              Learn More
-            </Link>
-          </div>
+          {
+            entry && <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {
+                entry.organizations
+                  .sort((a, b) => influenceLevelToNumeric(b.influenceLevel) - influenceLevelToNumeric(a.influenceLevel))
+                  .map(x =>
+                    <div key={x.name} className="mb-4">
+                      <Card className="rounded-md bg-white p-4 shadow-sm dark:bg-gray-900">
+                        <CardHeader className="flex items-center space-x-4">
+                          <div>
+                            <h3 className="text-lg font-semibold">{x.name}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{x.rechtsform}{x.position ? `, ${x.position}` : ''}</p>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="mt-2 space-y-2">
+                          <Badge style={{ backgroundColor: influenceLevelToColor(x.influenceLevel) }}>
+                            {x.influenceLevel}
+                          </Badge>
+                          <p className="mt-2 text-sm">
+                            <Link href="https://lobbywatch.ch/de/seite/wirksamkeit">How to interpret the influence level?</Link>
+                          </p>
+                          {x.vergueting && <p className="text-gray-700 dark:text-gray-300">Vergütung: {x.vergueting}</p>}
+                        </CardContent>
+                      </Card>
+                    </div>)
+              }
+            </div>
+          }
+          {
+            (!entry || entry.organizations.length === 0) && <p className="text-center">No information for this councilor.</p>
+          }
         </TabsContent>
         <TabsContent className="p-1" value="votes">
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Vote 1</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Details about Vote 1.</p>
-            <Link className="text-blue-500 underline" href="#">
-              Learn More
-            </Link>
-          </div>
+          {
+            entry && entry.bills.map(x =>
+              <div key={x.title} className="mb-4">
+                <h3 className="text-lg font-semibold">{x.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{x.billText}</p>
+                <p className="text-blue-500 underline">{x.voteResult}</p>
+              </div>)
+          }
+          {
+            (!entry || entry.bills.length === 0) && <p className="text-center">No information for this councilor.</p>
+          }
         </TabsContent>
         <TabsContent className="p-1" value="committees">
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Committee 1</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Details about Committee 1.</p>
-            <Link className="text-blue-500 underline" href="#">
-              Learn More
-            </Link>
-          </div>
+          {
+            entry && entry.committees.map(x => <ul className="m-3 list-disc" key={x.name}>
+              <li className="text-lg">{x.name}</li>
+            </ul>)
+          }
+          {
+            (!entry || entry.organizations.length === 0) && <p className="text-center">No information for this councilor.</p>
+          }
         </TabsContent>
       </Tabs>
     </section>
