@@ -269,12 +269,15 @@ export async function getaveragemapping(): Promise<{ averagemap: Map<string, num
 export function computeanomaly(VotersScoremap: Map<string, number>, averagemap: Map<string, number>, ){
     // do the anomaly computation
     const anomaly = new Map<string, number>();
+    var anomalyvalue = 0;
     for (const [organization, score] of VotersScoremap.entries()) {
         const average = averagemap.get(organization);
         if (!average) {
             throw new Error(`Organization ${organization} not found in average map.`);
+            anomalyvalue = 0;
+        }else{
+          anomalyvalue = score - average;
         }
-        const anomalyvalue = score - average;
         anomaly.set(organization, anomalyvalue);
     }
 
