@@ -31,12 +31,12 @@ export default async function BillsOverviewPage() {
         text="Explore different bills and their lobby influences"
       />
       <div className="grid gap-10">
-        <div className="divide-y divide-border rounded-md border">
+        <div>
           {acceptedBills.map((bill) => (
             <ListItem
               key={bill.id}
               name={bill.title}
-              description={`${bill.sponsor.name} from ${bill.sponsor.party.shortName} proposed: ${bill.billText}`}
+              description={`${bill.sponsor.firstName} from ${bill.sponsor.party.shortName} proposed: ${bill.billText}`}
             />
           ))}
         </div>
