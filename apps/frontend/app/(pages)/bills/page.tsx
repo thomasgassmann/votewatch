@@ -51,7 +51,7 @@ export default function BillsPageLoading() {
       if (!sponsorref) {
         throw new Error(`Parliamentarian with id ${selected.sponsorId} not found.`);
       }
-      const top3 = getallTop3(sponsorref.id, votersResult[0], votersResult[1])
+      const top3 = await getallTop3(sponsorref.id, votersResult[0], votersResult[1])
 
       setSelectedBill(selected || null);
       setSponsorname(sponsorref.name);
