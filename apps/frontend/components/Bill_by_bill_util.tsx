@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { $Enums, PrismaClient } from '@prisma/client';
 import React, { useEffect, useRef } from 'react';
 import {loadBillVoteresbyid, loadBillById, getAllParliamentarians, getParliamentarianById} from './getbills';
@@ -13,7 +15,7 @@ async function scoreParliamentarian(parliamentarianId: string): Promise<Map<stri
 
         if (parliamentarian) {
             const orgs = parliamentarian.relatedOrganizations;
-            
+
             orgs.forEach(org => {
                 const organization = org.organizationId;
                 const influencemod = org.influenceLevel === "TIEF" || org.influenceLevel === "UNKNOWN" ? 1 : org.influenceLevel === "MITTEL" ? 2 : 3;
@@ -71,7 +73,7 @@ async function calculateBillmaps(billId: string): Promise<[Map<string, number>, 
     //compute the average maps for the yes and no voters
     const yesVotersScoremap = new Map<string, number>();
     const noVotersScoremap = new Map<string, number>();
-    
+
     for (const parliamentarianId of yesVotersIds) {
         const scoreMap = await scoreParliamentarian(parliamentarianId);
         for (const [organization, score] of scoreMap.entries()) {
@@ -183,8 +185,8 @@ const BarVisualization = ({ data, isVoteVisualization }) => {
   svgString += `<g>`;
   svgString += `<rect x="${margin.left}" y="${margin.top}" width="${innerWidth}" height="${yScale.bandwidth()}" fill="lightgray" rx="5" ry="5" />`;
 
-  svgString += `<rect x="${margin.left}" y="${margin.top}" 
-    width="${xScale(data[0])}" height="${yScale.bandwidth()}" 
+  svgString += `<rect x="${margin.left}" y="${margin.top}"
+    width="${xScale(data[0])}" height="${yScale.bandwidth()}"
     fill="${isVoteVisualization ? 'green' : 'darkgray'}" rx="5" ry="5" />`; // Single bar with variable width
 
   svgString += `</g>`;
@@ -193,8 +195,8 @@ const BarVisualization = ({ data, isVoteVisualization }) => {
   svgString += `<g>`;
   if (data[0] !== 0) {
     const textX = margin.left + xScale(data[0]) - 5; // Adjusted x-coordinate for text
-    svgString += `<text x="${textX}" 
-      y="${margin.top + yScale('Bar') + yScale.bandwidth() / 2}" 
+    svgString += `<text x="${textX}"
+      y="${margin.top + yScale('Bar') + yScale.bandwidth() / 2}"
       text-anchor="end" fill="${isVoteVisualization ? 'white' : 'white'}">${data[0]}</text>`;
   }
   svgString += `</g>`;
@@ -222,7 +224,7 @@ const BarVisualization = ({ data, isVoteVisualization }) => {
 };
 
 
-//compute average score of any parliamentarian, cache it 
+//compute average score of any parliamentarian, cache it
 let averageMappingCache: { averagemap: Map<string, number>, maxTotalScore: number } | null = null;
 
 export async function getaveragemapping(): Promise<{ averagemap: Map<string, number>, maxTotalScore: number }> {
@@ -281,7 +283,7 @@ export function computeanomaly(VotersScoremap: Map<string, number>, averagemap: 
     //sort the anomaly map
     const sortedanomaly = new Map([...anomaly.entries()].sort((a, b) => b[1] - a[1]));
     //return the anomaly map
-    return sortedanomaly;    
+    return sortedanomaly;
 }
 
 export async function getallTop3(sponsorId: string, yesVotersIds: string[], noVotersIds: string[]){
@@ -358,7 +360,7 @@ export async function getallTop3(sponsorId: string, yesVotersIds: string[], noVo
     for (const [organization, score] of noVotersMap.entries()) {
       noVotersScore += score;
     }
-    
+
     var noVotersClassification = "Low";
     if (noVotersScore >(averagescore+ averagemapping.maxTotalScore)/2){
         noVotersClassification = "High";
@@ -371,7 +373,7 @@ export async function getallTop3(sponsorId: string, yesVotersIds: string[], noVo
 
     return [sponsorClassification, sponsorTop3, yesVotersClassification, yesVotersTop3, noVotersClassification, noVotersTop3];
 
-}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+}
 
 
 // function that gets the list of votes for a bill and returns the bar chart, takes in tuple of yes, no, abstain lists
@@ -387,7 +389,7 @@ export async function makevotesbar(billId: string): Promise<string> {
     const svgString = BarVisualization({ data, isVoteVisualization: true });
     return svgString;
   }
-  
+
   export async function makesponsorbar(billId: string): Promise<string> {
     const scores = await calculateBillScores(billId);
     const sponsorScore = scores[0];
@@ -397,7 +399,7 @@ export async function makevotesbar(billId: string): Promise<string> {
     const svgString = BarVisualization({ data, isVoteVisualization: false });
     return svgString;
   }
-  
+
   export async function makeyesbar(billId: string): Promise<string> {
     const maps = await calculateBillmaps(billId);
     const yesVotersScoremap = maps[0];
@@ -420,7 +422,7 @@ export async function makevotesbar(billId: string): Promise<string> {
     const svgString = BarVisualization({ data, isVoteVisualization: false });
     return svgString;
   }
-  
+
   export async function makenobar(billId: string): Promise<string> {
     const maps = await calculateBillmaps(billId);
     const noVotersScoremap = maps[1];

@@ -1,10 +1,12 @@
+// @ts-nocheck
+
 'use client'
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
 
 export const BillPie = ({data}) => {
     const svgRef = useRef<SVGSVGElement>(null);
-    
+
     useEffect(() => {
         if (svgRef.current) {
             d3.select(svgRef.current).selectAll('*').remove();
@@ -12,7 +14,7 @@ export const BillPie = ({data}) => {
             const width = 150; // Updated width
             const height = 150; // Updated height
             const radius = Math.min(width, height) / 2;
-            
+
             const svg = d3.select(svgRef.current)
                 .append('svg')
                 .attr('width', width) // Set the width
@@ -20,7 +22,7 @@ export const BillPie = ({data}) => {
                 .attr('viewBox', `0 0 ${width} ${height}`) // Set the viewBox to maintain aspect ratio
                 .append('g') // Append a group element for centering
                 .attr('transform', `translate(${width / 2}, ${height / 2})`); // Center the group element
-            
+
             // Calculate total votes
             const yeslength = data[0].length;
             const nolength = data[1].length;
@@ -39,7 +41,7 @@ export const BillPie = ({data}) => {
             // Colors for the pie chart
             const colors = ['#4CAF50', '#FF5252', '#B0BEC5']; // Green, Red, Grey
 
-            
+
 
             // Create a pie chart
             const pie = d3.pie().value(d => d.value);
@@ -66,6 +68,6 @@ export const BillPie = ({data}) => {
                 .text(d => d.data.value);
         }
     }, [data]);
-    
+
     return <svg ref={svgRef} />;
 };

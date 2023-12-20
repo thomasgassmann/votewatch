@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from 'next/router';
 import { PageShell } from '@/components/shell';
 import { PageHeader } from '../../../components/header';
 import { getallTop3 } from '../../../components/Bill_by_bill_util';
@@ -7,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { Bill } from '@prisma/client';
 import { loadbills, getParliamentarianById, loadBillVoteresbyid } from '../../../components/getbills';
 import { CardHeader, CardContent, Card } from "@/components/ui/card"
-import { Avatar } from "@/components/ui/avatar"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { BillPie } from '../../../components/drawd3';
 import { Button } from '@/components/ui/button';
@@ -19,8 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { get } from 'http';
-
 
 export default function BillsPageLoading() {
   const [bills, setBills] = useState<Bill[]>([]);
@@ -54,7 +51,7 @@ export default function BillsPageLoading() {
       const top3 = await getallTop3(sponsorref.id, votersResult[0], votersResult[1])
 
       setSelectedBill(selected || null);
-      setSponsorname(sponsorref.name);
+      setSponsorname(sponsorref.firstName + ' ' + sponsorref.lastName);
       setVoters(votersResult);
       console.log(top3);
       setSponsorclass(top3[0] as string);
@@ -78,7 +75,7 @@ export default function BillsPageLoading() {
         heading="Bills"
         text="Explore different bills and their lobby influences"
       />
-      <h1 className="font-semibold text-2xl">Bill Data Visualization</h1>
+      <h1 className="text-2xl font-semibold">Bill Data Visualization</h1>
       <form className="flex items-center">
         <div className="grid gap-10">
         </div>
@@ -101,7 +98,7 @@ export default function BillsPageLoading() {
         </Select>
       </form>
 
-      <main className="p-4 bg-gray-50 min-h-screen">
+      <main className="min-h-screen bg-gray-50 p-4">
         <Card className="mb-4">
           <CardHeader>
             <div className="flex items-center">
@@ -109,18 +106,18 @@ export default function BillsPageLoading() {
               <Badge className="ml-2">{selectedBill?.title}</Badge>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Voting Results</h3>
+              <h3 className="mb-2 text-lg font-semibold">Voting Results</h3>
               {selectedBill && <BillPie data={voters} />}
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2">Explaination:</h3>
+              <h3 className="mb-2 text-lg font-semibold">Explaination:</h3>
               <p className="text-base">On this page you can select any bill that has been voted on in parliament in the proceeding legislature.
-              The classification of the influence levels of a bill's sponsor, yes or no voters bases itself on a comparison to the median parliamentarian.
-              A low level indicates significantly fewer special interest connections while a high level indicates significantly more. 
-              The top three standout special interest connections of a parliamentarian are listed in order of how much they influence the given group more 
-              than the median parliamentarian. 
+              The classification of the influence levels of a bill&apos;s sponsor, yes or no voters bases itself on a comparison to the median parliamentarian.
+              A low level indicates significantly fewer special interest connections while a high level indicates significantly more.
+              The top three standout special interest connections of a parliamentarian are listed in order of how much they influence the given group more
+              than the median parliamentarian.
                 </p>
             </div>
           </CardContent>
@@ -131,39 +128,43 @@ export default function BillsPageLoading() {
             <h2 className="text-lg font-semibold">Bill Sponsor</h2>
           </CardHeader>
           <CardContent className="flex items-center space-x-4">
-            <Avatar alt="Bill Sponsor" className="w-12 h-12" src="/placeholder.svg?height=50&width=50" />
+            <Avatar className="h-12 w-12">
+              <AvatarImage alt="Bill Sponsor" src="/placeholder.svg?height=50&width=50" />
+            </Avatar>
             <div>
               <h3 className="font-semibold">{sponsorname}</h3>
               <p className="text-sm">Special Interest Level: {sponsorclass}</p>
             </div>
             <div className="col-span-1 self-start">
-              <ul className="list-disc list-inside mt-2">
+              <ul className="mt-2 list-inside list-disc">
                 <li>{sponsorTop3[0]}</li>
                 <li>{sponsorTop3[1]}</li>
                 <li>{sponsorTop3[2]}</li>
               </ul>
             </div>
-            <div className="flex justify-start col-span-3">
+            <div className="col-span-3 flex justify-start">
               <Button className="mt-2">More Details</Button>
             </div>
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <h2 className="text-lg font-semibold">'Yes' Voters</h2>
+              <h2 className="text-lg font-semibold">&apos;Yes&apos; Voters</h2>
             </CardHeader>
             <CardContent>
               <ul>
-                <li className="flex items-center space-x-4 mb-2">
-                  <Avatar className="w-8 h-8" src="/placeholder.svg?height=50&width=50" />
+                <li className="mb-2 flex items-center space-x-4">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/placeholder.svg?height=50&width=50" />
+                  </Avatar>
                   <div>
                     <p className="font-semibold">Special interest influences</p>
                     <Badge>{yesclass}</Badge>
                   </div>
                   <div className="col-span-1 self-start">
-                    <ul className="list-disc list-inside mt-2">
+                    <ul className="mt-2 list-inside list-disc">
                       <li>{yesTop3[0]}</li>
                       <li>{yesTop3[1]}</li>
                       <li>{yesTop3[2]}</li>
@@ -175,18 +176,20 @@ export default function BillsPageLoading() {
           </Card>
           <Card>
             <CardHeader>
-              <h2 className="text-lg font-semibold">'No' Voters</h2>
+              <h2 className="text-lg font-semibold">&apos;No&apos; Voters</h2>
             </CardHeader>
             <CardContent>
               <ul>
-                <li className="flex items-center space-x-4 mb-2">
-                  <Avatar alt="Voter 1" className="w-8 h-8" src="/placeholder.svg?height=50&width=50" />
+                <li className="mb-2 flex items-center space-x-4">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage alt="Voter 1" src="/placeholder.svg?height=50&width=50" />
+                  </Avatar>
                   <div>
                     <p className="font-semibold">Special interest influences</p>
                     <Badge>{noclass}</Badge>
                   </div>
                   <div className="col-span-1 self-start">
-                    <ul className="list-disc list-inside mt-2">
+                    <ul className="mt-2 list-inside list-disc">
                       <li>{noTop3[0]}</li>
                       <li>{noTop3[1]}</li>
                       <li>{noTop3[2]}</li>
