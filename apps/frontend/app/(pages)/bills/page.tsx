@@ -57,12 +57,12 @@ export default function BillsPageLoading() {
       setSponsorname(sponsorref.name);
       setVoters(votersResult);
       console.log(top3);
-      setSponsorclass(top3[0]);
-      setSponsorTop3(top3[1]);
-      setYesclass(top3[2]);
-      setYesTop3(top3[3]);
-      setNoclass(top3[4]);
-      setNoTop3(top3[5]);
+      setSponsorclass(top3[0] as string);
+      setSponsorTop3(top3[1] as string[]);
+      setYesclass(top3[2] as string);
+      setYesTop3(top3[3] as string[]);
+      setNoclass(top3[4] as string);
+      setNoTop3(top3[5] as string[]);
     }
   };
 
