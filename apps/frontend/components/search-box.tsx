@@ -1,37 +1,64 @@
 "use client";
 
 import { range } from "rambdax";
-import { User, Paperclip} from "lucide-react";
+import { User, Paperclip, UserIcon} from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "./ui/command";
+import { useRouter } from "next/navigation";
+import { getAllParliamentarians } from "./getbills";
+import { Bill, LobbyOrganization, Parliamentarian } from "@votewatch/database";
 
-export default function SearchBox() {
-  return             <Command className="rounded-lg border shadow-md">
-  <CommandInput placeholder="Search a bill or organization" />
+interface SearchBoxProps {
+  parlamentarians: Parliamentarian[],
+  bills: Pick<Bill, 'id' | 'title'>[],
+  lobbyOrganizations: Pick<LobbyOrganization, 'id' | 'name'>[]
+}
+export default function SearchBox({ parlamentarians, bills, lobbyOrganizations}: SearchBoxProps) {
+
+  const router = useRouter();
+
+  return  (<Command className="rounded-lg border shadow-md">
+  <CommandInput placeholder="Search a person, organization or bill" />
   <CommandList>
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandGroup heading="Categories">
-      <CommandItem>
-        <User className="mr-2 h-4 w-4" />
-        <span>People</span>
-      </CommandItem>
-      <CommandItem>
+      <CommandItem onSelect={() => router.push('/organizations') }>
         <User className="mr-2 h-4 w-4" />
         <span>Organizations</span>
       </CommandItem>
-      <CommandItem>
+      <CommandItem onSelect={() => router.push('/members') }>
+        <User className="mr-2 h-4 w-4" />
+        <span>Parlamentarians</span>
+      </CommandItem>
+      <CommandItem onSelect={() => router.push('/bills') }>
         <User className="mr-2 h-4 w-4" />
         <span>Bills</span>
       </CommandItem>
     </CommandGroup>
     <CommandSeparator />
+    <CommandGroup heading="Parlamentarians">
+      {parlamentarians.map((p) => (
+        <CommandItem onSelect={() => router.push(`/members?id=${p.id}`)}>
+          <UserIcon className="mr-2 h-4 w-4" />
+          <span>{ p.firstName + " " + p.lastName}</span>
+        </CommandItem>
+      ))}
+    </CommandGroup>
+    <CommandGroup heading="Organizations">
+      {lobbyOrganizations.map((org) => (
+        <CommandItem onSelect={() => router.push(`/organizations?id=${org.id}`)}>
+          <UserIcon className="mr-2 h-4 w-4" />
+          <span>{ org.name }</span>
+        </CommandItem>
+      ))}
+    </CommandGroup>
     <CommandGroup heading="Bills">
-      {range(1, 4).map((i) => (
-        <CommandItem>
-          <Paperclip className="mr-2 h-4 w-4" />
-          <span>Bill #{i}</span>
+      {bills.map((bill) => (
+        <CommandItem onSelect={() => router.push(`/bills?id=${bill.id}`)}>
+        <Paperclip className="mr-2 h-4 w-4" />
+          <span>{bill.title}</span>
         </CommandItem>
       ))}
     </CommandGroup>
   </CommandList>
-</Command>
+</Command>)
 }
