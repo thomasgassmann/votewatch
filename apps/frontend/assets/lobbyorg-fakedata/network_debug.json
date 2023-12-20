@@ -22,9 +22,52 @@
     { "id": 20, "name": "Organsation 5",    "category": "org" },
     { "id": 21, "name": "Organsation 6",    "category": "org" },
     { "id": 22, "name": "Organsation 7",    "category": "org" },
-    { "id": 23, "name": "Organsation 8",    "category": "org" }
+    { "id": 23, "name": "Organsation 8",    "category": "org" },
+    { "id": 24, "name": "Parlamentarier 4", "category": "parl" },
+    { "id": 25, "name": "Parlamentarier 5", "category": "parl" },
+    { "id": 26, "name": "Parlamentarier 6", "category": "parl" },
+    { "id": 27, "name": "Parlamentarier 7", "category": "parl" },
+    { "id": 28, "name": "Parlamentarier 8", "category": "parl" }
+  ],
+  "party2parl_idtrees": [
+      {
+          "root_id": 12,
+          "children_id": [
+              17, 18, 19
+          ]
+      },
+      {
+          "root_id": 13,
+          "children_id": []
+      },
+      {
+          "root_id": 14,
+          "children_id": []
+      },
+      {
+          "root_id": 15,
+          "children_id": []
+      },
+      {
+          "root_id": 16,
+          "children_id": []
+      },
+      {
+          "root_id": 16,
+          "children_id": [
+              24, 25, 26, 27, 28
+          ]
+      }
   ],
   "branch2org_idtrees": [
+      {
+          "root_id":  1,
+          "children_id": []
+      },
+      {
+          "root_id":  2,
+          "children_id": []
+      },
       {
           "root_id": 3,
           "children_id": [
@@ -36,6 +79,18 @@
           "children_id": [
               20, 21, 22, 23
           ]
+      },
+      {
+          "root_id":  5,
+          "children_id": []
+      },
+      {
+          "root_id":  6,
+          "children_id": []
+      },
+      {
+          "root_id":  7,
+          "children_id": []
       }
   ],
   "branch2party_edges": [

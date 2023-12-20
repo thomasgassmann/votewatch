@@ -3,7 +3,7 @@
 import * as d3 from "d3";
 import { useEffect } from "react";
 
-import dummyData from "../assets/lobbyorg-fakedata/network_debug.json";
+import dummyData from "../../assets/lobbyorg-fakedata/network_debug.json";
 
 export function LobbyOrg() {
 
@@ -16,7 +16,7 @@ export function LobbyOrg() {
     const width = 500;
     const height = 500;
 
-    const minSpace = 15;
+    const minSpace = 45;
     const maxSpace = 50;
 
     const bulletRadius = 1;
@@ -29,10 +29,10 @@ export function LobbyOrg() {
     const colorInactive = "#555"
     const colorActive = "#DD3333"
 
-    const fontStyle = '10px sans-serif';
+    const fontStyle = '14px sans-serif';
     const borderStyle = `3px solid ${colorFG}`;
 
-    const duration = 2500;
+    const duration = 250;
 
     const dummyRootId = -1;
     const dummyRootName = 'dummyRoot';
@@ -239,7 +239,7 @@ export function LobbyOrg() {
 
       // DEF: drawTree --------------------------------------------------------
 
-      const drawTree = (data, initX, initY, dx, dy, growDirection, nodeClass, leafClass) => {
+      const drawTree = (data, initX, initY, dx, dy, growDirection) => {
         const growLeft = growDirection === 'left';
 
         const root = d3.hierarchy(data);
@@ -248,8 +248,8 @@ export function LobbyOrg() {
         const diagonal = d3.linkHorizontal().x((d) => d.y).y((d) => d.x);
 
         // TODO: adapt to plot
-        root.x0 = rootInitX;
-        root.y0 = rootInitY;
+        root.x0 = initX;
+        root.y0 = initY;
         root.descendants().forEach((d) => {
           d.id = d.data.id;
           d._children = d.children;
@@ -276,8 +276,13 @@ export function LobbyOrg() {
 
         function update(source) {
 
-          const nodes = root.descendants().reverse()
-          const links = root.links();
+          const nodes = root
+            .descendants()
+            .reverse()
+            .filter((d) => d.id !== root.id);
+          const links = root
+            .links()
+            .filter((l) => ![l.source.id, l.target.id].includes(root.id));
 
           // compute new tree layout
           let left = root;
@@ -343,6 +348,7 @@ export function LobbyOrg() {
           nodeEnter
             .append('circle')
             .filter((d) => d.depth !== 2) // do not add outer circles to leaves
+            .filter((d) => d.children === null && d._children === null) // do not add outer circles to leaves
             .attr('r', bulletRadius)
             .attr('cx', (d) => {
               const width = getTextDimensions(d.data.name)[0];
@@ -435,9 +441,10 @@ export function LobbyOrg() {
 
       // nodes
       const getNodesByCategory = (c) => data.nodes.filter((n) => n.category === c);
-      const parties = getNodesByCategory('party');
       const branches = getNodesByCategory('branch');
       const organizations = getNodesByCategory('org');
+      const parties = getNodesByCategory('party');
+      const parls = getNodesByCategory('parl');
 
       // edge data
       const branch2party = data.branch2party_edges;
@@ -445,6 +452,11 @@ export function LobbyOrg() {
       const branch2org_treeRep = constructTreeRepresentation(
         dummyRootId, dummyRootName, dummyRootCategory,
         data.branch2org_idtrees, branches, organizations
+      );
+
+      const party2parl_treeRep = constructTreeRepresentation(
+        dummyRootId, dummyRootName, dummyRootCategory,
+        data.party2parl_idtrees, parties, parls
       );
 
       // DRAW -----------------------------------------------------------------
@@ -458,18 +470,14 @@ export function LobbyOrg() {
 
       // drawEdges(branch2party, branchCircles, partyCircles, 'branch2party');
 
-      // left part of graph (branch2org)
-
-      const rootInitX = 400;
-      const rootInitY = 120;
-
       const max_cols = 4
       const dx = minSpace;
-      // TODO: check if maxSpace should be minSpace
-      const dy = Math.max(width / (max_cols + 1), maxSpace); 
+      const dy = Math.max(width / 3, minSpace);
 
-      drawTree(branch2org_treeRep, rootInitX, rootInitY, dx, dy, 'left', 'branch', 'org');
+      drawTree(branch2org_treeRep, 3 * width / max_cols, height / 2, dx, dy, 'left');
+      drawTree(party2parl_treeRep, 1 * width / max_cols, height / 2, dx, dy, 'right');
 
+      const br = svg.selectAll('circle.branch');
       // UPDATE ---------------------------------------------------------------
 
       // Remove the existing SVG element
