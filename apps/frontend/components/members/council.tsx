@@ -1,6 +1,7 @@
 'use client';
 
 import * as d3 from "d3";
+import type { Selection } from 'd3';
 import { FC, useEffect, useRef, useState } from "react";
 
 import meta from './meta.json';
@@ -119,9 +120,48 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
       let rowThickness = 35;
       const rowDistance = 10;
 
-      let members = data.sort((a, b) => a.number - b.number);
+      let bottomRow: number[] = [];
+      let members = [...data].sort((a, b) => a.number - b.number);
       while (members[0].number < meta.pieFrom) {
-        members.shift();
+        bottomRow.push(members.shift()!.number);
+      }
+
+      const setData = (input: Selection<d3.BaseType, unknown, d3.BaseType, unknown>, memberNumber: number) => {
+        const member = data.find(x => x.number === memberNumber)!;
+        const currentParliamentarian: Parliamentarian = parliamentarianFromSeatsInformation(memberNumber);
+
+        const entry = entryFromParliamentarian(entries, currentParliamentarian);
+        const r = input
+          .style('fill', member.parlGroupColour)
+          .on('mouseover', function (d, i) {
+            setHoverPos([mouseX, mouseY]);
+            setHover(currentParliamentarian);
+          })
+          .on('mouseout', function (d, i) {
+            if (cardRef.current &&
+              cardRef.current.getBoundingClientRect().left <= mouseX && mouseX <= cardRef.current.getBoundingClientRect().right &&
+              cardRef.current.getBoundingClientRect().top <= mouseY && mouseY <= cardRef.current.getBoundingClientRect().bottom) {
+              return;
+            }
+
+            setHover(null);
+          })
+          .on('click', () => onSelect(currentParliamentarian));
+
+        if (entry) {
+          const score = calculateRelativeInfluenceScore(entries, entry);
+          r.style('fill-opacity', score);
+        }
+      };
+
+      let currentX = -16.5 * rowDistance;
+      for (const bottomNumber of bottomRow) {
+        const c = bottomRowGroup.append('circle')
+          .attr('cx', currentX)
+          .attr('cy', - rowDistance * 3)
+          .attr('r', rowDistance);
+        setData(c, bottomNumber);
+        currentX += rowDistance * 3;
       }
 
       let rowNumber = 0;
@@ -142,10 +182,6 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
           const perMember = (area - (currentMembers.length - 1) * memberAngleDistance) / currentMembers.length;
           let currentAngle = fromAngle;
           for (const memberNumber of currentMembers) {
-            const member = data.find(x => x.number === memberNumber)!;
-            const currentParliamentarian: Parliamentarian = parliamentarianFromSeatsInformation(memberNumber);
-
-            const entry = entryFromParliamentarian(entries, currentParliamentarian);
 
             const arc = d3.arc()
               .innerRadius(currentRow)
@@ -155,36 +191,10 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
 
             const r = halfCircleGroup.append('path')
               .attr('d', arc)
-              .style('fill', member.parlGroupColour)
               .style('cursor', 'pointer')
-              .style('fill-opacity', 0.3)
-              .on('mouseover', function (d, i) {
-                setHoverPos([mouseX, mouseY]);
-                setHover(currentParliamentarian);
-                // d3.select(this).transition()
-                //   .duration(50)
-                //   .style('fill-opacity', '.7');
-              })
-              .on('mouseout', function (d, i) {
-                if (cardRef.current &&
-                    cardRef.current.getBoundingClientRect().left <= mouseX && mouseX <= cardRef.current.getBoundingClientRect().right &&
-                    cardRef.current.getBoundingClientRect().top <= mouseY && mouseY <= cardRef.current.getBoundingClientRect().bottom) {
-                  return;
-                }
+              .style('fill-opacity', 0.3);
 
-                setHover(null);
-
-                // d3.select(this).transition()
-                //   .duration(50)
-                //   .style('fill-opacity', '1');
-              })
-              .on('click', () => onSelect(currentParliamentarian));
-
-
-            if (entry) {
-              const score = calculateRelativeInfluenceScore(entries, entry);
-              r.style('fill-opacity', score);
-            }
+            setData(r, memberNumber);
 
             currentAngle += perMember + memberAngleDistance;
           }
@@ -213,7 +223,6 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
         currentRow += rowDistance + rowThickness;
         rowNumber++;
       }
-
     }
   }, [onSelect, setHover, setHoverPos, entries]);
 
