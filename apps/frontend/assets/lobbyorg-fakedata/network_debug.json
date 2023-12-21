@@ -50,10 +50,6 @@
       },
       {
           "root_id": 16,
-          "children_id": []
-      },
-      {
-          "root_id": 16,
           "children_id": [
               24, 25, 26, 27, 28
           ]

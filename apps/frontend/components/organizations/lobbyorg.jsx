@@ -47,6 +47,7 @@ export function LobbyOrg() {
     const dummyRootCategory = 'dummy';
 
     const container = d3.select('#container');
+    const diagonal = d3.linkHorizontal().x((d) => d.y).y((d) => d.x);
 
     // DEFINITIONS ------------------------------------------------------------
 
@@ -182,39 +183,6 @@ export function LobbyOrg() {
         }
       }; // END drawNodes
 
-      // DEF: drawEdges -------------------------------------------------------
-
-      const drawEdges = (links, branchCircles, partyCircles, edgeClassName) => {
-        const curveGroup = svg.append('g');
-        const curvePath = curveGroup.selectAll('path')
-          .data(links)
-          .enter().append('path')
-          .attr('d', (link) => {
-            const sourceCircle = branchCircles.filter((d) => d.id === link.source).datum();
-            const targetCircle = partyCircles.filter((d) => d.id === link.target).datum();
-
-            const x0 = sourceCircle.cx + sourceCircle.tx
-            const y0 = sourceCircle.cy + sourceCircle.ty
-            const x1 = targetCircle.cx + targetCircle.tx
-            const y1 = targetCircle.cy + targetCircle.ty
-
-            const mid = (x0 + x1) / 2;
-            const cx0 = mid;
-            const cy0 = y0;
-            const cx1 = mid;
-            const cy1 = y1;
-
-            // cubic bezier
-            return `M ${x0},${y0} C ${cx0},${cy0} ${cx1},${cy1} ${x1}, ${y1}`;
-          })
-          .attr('class', edgeClassName)
-          .attr('fill', 'none')
-          .attr('stroke', colorInactive)
-          .attr('stroke-width', bulletRadius)
-          // TODO: add fields branch, party, org and parl
-          .datum((d) => ({ branch: d.source, party: d.target }))
-      }; // END drawEdges
-
       // DEF: constructTreeRepresentation -------------------------------------
 
       const constructTreeRepresentation = (
@@ -244,19 +212,19 @@ export function LobbyOrg() {
 
       // DEF: drawTree --------------------------------------------------------
 
-      const drawTree = (data, initX, initY, dx, dy, growDirection) => {
+      const drawTree = (data, origin, dx, dy, growDirection, nodeLabel, leafLabel) => {
         const growLeft = growDirection === 'left';
 
         const tree = d3.tree().nodeSize([dx, dy]);
         const root = d3.hierarchy(data);
         root.sort((a, b) => a.data.name.localeCompare(b.data.name));
 
-        // TODO: adapt to plot
-        root.x0 = initX;
-        root.y0 = initY;
+        root.x0 = origin.x;
+        root.y0 = origin.y;
         root.descendants().forEach((d) => {
           d.id = d.data.id;
           d._children = d.children;
+          d.width = getTextDimensions(d.data.name)[0];
         })
 
         // grow tree to left if necessary
@@ -268,13 +236,13 @@ export function LobbyOrg() {
           .attr('stroke', colorInactive)
           .attr('stroke-opacity', linkOpacity)
           .attr('stroke-width', bulletRadius)
-          .attr('transform', `translate(${initX}, ${initY})`);
+          .attr('transform', `translate(${origin.x}, ${origin.y})`);
 
         const gNode = svg
           .append('g')
           .attr('cursor', 'pointer')
           .attr('pointer-events', 'all')
-          .attr('transform', `translate(${initX}, ${initY})`);
+          .attr('transform', `translate(${origin.x}, ${origin.y})`);
 
         update(root);
 
@@ -283,18 +251,15 @@ export function LobbyOrg() {
           const nodes = root
             .descendants()
             .reverse()
-            .filter((d) => d.id !== root.id);
+            .filter((d) => d.id !== root.id)
+
           const links = root
             .links()
             .filter((l) => ![l.source.id, l.target.id].includes(root.id));
 
           // compute new tree layout
-          let left = root;
-          let right = root;
-          root.eachBefore((node) => {
-            if (node.x < left.x) left = node;
-            if (node.x > right.x) right = node;
-          })
+          const left = d3.min(root.descendants(), (node) => node.x);
+          const right = d3.max(root.descendants(), (node) => node.x);
 
           // const height = right.x - left.x + margin.top + margin.bottom;
 
@@ -305,14 +270,22 @@ export function LobbyOrg() {
           const node = gNode
             .selectAll('g')
             .data(nodes, (d) => d.id)
+            .attr('class', (d) => {
+              if (d.depth === 1) {
+                return nodeLabel;
+              } else if (d.depth === 2) {
+                return leafLabel;
+              } else {
+                return null;
+              }
+            });
 
           // Enter any new nodes at the parent's previous position.
           const nodeEnter = node
             .enter()
             .append('g')
             .attr('transform', (d) => {
-              const width = getTextDimensions(source.data.name)[0];
-              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + width);
+              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
               return `translate(${source.y + offset},${source.x})`;
             })
             // make invisible first
@@ -333,8 +306,10 @@ export function LobbyOrg() {
           nodeEnter
             .append('circle')
             .filter((d) => d.depth !== 0) // do not add inner circles to roots
+            .attr('class', (d) => d.depth === 1 ? nodeLabel : null)
             .attr('r', bulletRadius)
-            .attr('fill', colorFG)
+            // .attr('fill', colorFG)
+            .attr('fill', 'red')
             .attr('stroke-width', bulletRadius);
 
           // labels
@@ -342,6 +317,7 @@ export function LobbyOrg() {
             .append('text')
             .text((d) => d.data.name)
             .attr('text-anchor', growLeft ? 'end' : 'start')
+            // TODO: add txtHeight to d, also adapt width to txtWidth
             .attr('dy', (d) => getTextDimensions(d.data.name)[1] / 4)
             .attr('dx', (growLeft ? -1 : 1) * bulletPadding)
             .clone(true)
@@ -357,13 +333,11 @@ export function LobbyOrg() {
             // do not add outer circles to leaves
             .filter((d) => d.depth !== 2) 
             // do not add outer circles to leaves or nodes without children
-            .filter((d) => 
+            .filter((d) =>
               !(d.data.children !== null && d.data.children.length === 0)
-              ) 
+            ) 
             .attr('r', bulletRadius)
-            .attr('cx', (d) => {
-              return (growLeft ? -1 : 1) * (2 * bulletPadding + d.width);
-            })
+            .attr('cx', (d) => (growLeft ? -1 : 1) * (2 * bulletPadding + d.width))
             .attr('fill', colorFG)
             .attr('stroke-width', bulletRadius);
 
@@ -393,25 +367,17 @@ export function LobbyOrg() {
           const link = gLink
             .selectAll("path")
             .data(links, (d) => d.target.id)
-            // .attr('class', (d) => {
-            //   // parent and child depth
-            //   const [p, c] = [d.source.depth, d.target.depth].sort();
-            //   if (p === 0) {
-            //     return 'ghostLink';
-            //   } else if (p === 1) {
-            //     return nodeClass + 'Link';
-            //   } else {
-            //     return leafClass + 'Link';
-            //   }
-            // });
+            .attr('class', (d) => {
+              const [x, y] = [d.source.depth, d.target.depth].sort();
+              return (x === 1 && y === 2) ? `${nodeLabel}2${leafLabel}Link` : null;
+            });
 
           // enter any new links at the parent's previous position
           const linkEnter = link
             .enter()
             .append('path')
             .attr('d', (d) => {
-              const width = getTextDimensions(source.data.name)[0];
-              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + width);
+              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
               const o = { x: source.x, y: source.y + offset};
               return diagonal({ source: o, target: o });
             });
