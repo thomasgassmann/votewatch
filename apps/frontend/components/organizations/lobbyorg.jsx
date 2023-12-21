@@ -11,36 +11,39 @@ export function LobbyOrg() {
   const { resolvedTheme  } = useTheme();
   const darkMode = resolvedTheme === 'dark'; // dark native :^)
 
-  const colorLight = '#FFF';
-  const colorDark = '#000';
+  const colorLight         = '#FFF';
+  const colorDark          = '#000';
   const colorLightInactive = "#555"
-  const colorLightActive = "#DD3333"
-  const colorDarkInactive = "#aaa"
-  const colorDarkActive = "#22aaff"
+  const colorLightActive   = "#DD3333"
+  const colorDarkInactive  = "#aaa"
+  const colorDarkActive    = "#22aaff"
 
-  const colorFG = darkMode ? colorLight : colorDark;
-  const colorBG = darkMode ? colorDark : colorLight;
-  const colorActive = darkMode ? colorDarkActive : colorLightActive;
+  const colorFG       = darkMode ? colorLight        : colorDark;
+  const colorBG       = darkMode ? colorDark         : colorLight;
+  const colorActive   = darkMode ? colorDarkActive   : colorLightActive;
   const colorInactive = darkMode ? colorDarkInactive : colorLightInactive;
 
   useEffect(() => {
 
     // PARAMETERS -------------------------------------------------------------
 
-    const margin = {top: 25, right: 25, bottom: 25, left: 25};
-
-    const minSpace = 45;
-    const maxSpace = 50;
+    const margin = { top: 25, right: 25, bottom: 25, left: 25 };
+    const width = 500;
+    const height = 500;
 
     const bulletRadius = 1;
     const bulletPadding = 7;
-
     const linkOpacity = 0.75;
-
+    const duration = 250;
     const fontStyle = '14px sans-serif';
     const borderStyle = `3px solid ${colorFG}`;
 
-    const duration = 250;
+    const dx = 45;
+    const dy = Math.max(width / 3, 45);
+    const horizontalIndentationBranch2org = (3 / 5) * width;
+    const horizontalIndentationParty2parl = (2 / 5) * width;
+
+    // DO NOT CHANGE  ---------------------------------------------------------
 
     const dummyRootId = -1;
     const dummyRootName = 'dummyRoot';
@@ -58,130 +61,130 @@ export function LobbyOrg() {
         .attr('height', '83vh')
         .style('font', fontStyle)
         .style('border', borderStyle)
-        .style('user-select', 'none');
+        .style('user-select', 'none')
         .attr('viewBox', [
           -margin.left, -margin.bottom, width+margin.right, height+margin.top
         ]);
 
       // DEF: drawNodes -------------------------------------------------------
 
-      const drawNodes = (nodes, offsetX, alignment, circleClassName) => {
-        const rightAlignment = alignment === 'right';
+      // const drawNodes = (nodes, offsetX, alignment, circleClassName) => {
+      //   const rightAlignment = alignment === 'right';
 
-        // TODO: maybe supply as argument similar to offsetX
-        // Calculate the vertical space between text elements
-        const verticalSpace = Math.min(Math.max(height / nodes.length, minSpace), maxSpace);
+      //   // TODO: maybe supply as argument similar to offsetX
+      //   // Calculate the vertical space between text elements
+      //   const verticalSpace = Math.min(Math.max(height / nodes.length, minSpace), maxSpace);
 
-        // Create a group for the text elements
-        const textGroup = svg.append("g");
+      //   // Create a group for the text elements
+      //   const textGroup = svg.append("g");
 
-        // Bind data to text elements
-        const textElements = textGroup.selectAll("g")
-          .data(nodes)
-          .enter().append("g")
-          .attr("transform", (d, i) =>
-            `translate(${offsetX},${i * verticalSpace})`
-          )
-          .on("click", (e, d) => handleClick(d))
-          .on("mouseover", (e, d) => handleMouseOver(d))
-          .on("mouseout", (e, d) => handleMouseOut(d));
+      //   // Bind data to text elements
+      //   const textElements = textGroup.selectAll("g")
+      //     .data(nodes)
+      //     .enter().append("g")
+      //     .attr("transform", (d, i) =>
+      //       `translate(${offsetX},${i * verticalSpace})`
+      //     )
+      //     .on("click", (e, d) => handleClick(d))
+      //     .on("mouseover", (e, d) => handleMouseOver(d))
+      //     .on("mouseout", (e, d) => handleMouseOut(d));
 
-        // Append circles to the left
-        const leftCircles = textElements.append("circle")
-          .attr('class', rightAlignment ? null : circleClassName)
-          .attr('r', bulletRadius)
-          .attr('cy', 0)
-          .attr('cx', (d) => {
-            const width = getTextDimensions(d.name)[0];
-            return rightAlignment ? -(bulletPadding + width) : -bulletPadding
-          })
-          // TODO: there must be a better way than repeating the above code...
-          .datum((d, i) => {
-            const width = getTextDimensions(d.name)[0];
-            return ({
-              cx: (rightAlignment ? -(bulletPadding + width) : -bulletPadding),
-              cy: 0,
-              id: d.id,
-              tx: offsetX,
-              ty: i * verticalSpace
-            });
-          });
+      //   // Append circles to the left
+      //   const leftCircles = textElements.append("circle")
+      //     .attr('class', rightAlignment ? null : circleClassName)
+      //     .attr('r', bulletRadius)
+      //     .attr('cy', 0)
+      //     .attr('cx', (d) => {
+      //       const width = getTextDimensions(d.name)[0];
+      //       return rightAlignment ? -(bulletPadding + width) : -bulletPadding
+      //     })
+      //     // TODO: there must be a better way than repeating the above code...
+      //     .datum((d, i) => {
+      //       const width = getTextDimensions(d.name)[0];
+      //       return ({
+      //         cx: (rightAlignment ? -(bulletPadding + width) : -bulletPadding),
+      //         cy: 0,
+      //         id: d.id,
+      //         tx: offsetX,
+      //         ty: i * verticalSpace
+      //       });
+      //     });
 
-        // Append text elements
-        textElements.append("text")
-          .text(d => d.name)
-          // Adjust horizontal position
-          .attr("x", 0)
-          // Adjust vertical position for centering
-          .attr("y", (d) => getTextDimensions(d.name)[1] / 4)
-          // color of text
-          .attr('fill', colorFG)
-          // Alignment of the text
-          .style("text-anchor", rightAlignment ? 'end' : 'start');
+      //   // Append text elements
+      //   textElements.append("text")
+      //     .text(d => d.name)
+      //     // Adjust horizontal position
+      //     .attr("x", 0)
+      //     // Adjust vertical position for centering
+      //     .attr("y", (d) => getTextDimensions(d.name)[1] / 4)
+      //     // color of text
+      //     .attr('fill', colorFG)
+      //     // Alignment of the text
+      //     .style("text-anchor", rightAlignment ? 'end' : 'start');
 
-        // Append circles to the right
-        const rightCircles = textElements.append("circle")
-          .attr('class', rightAlignment ? circleClassName : null)
-          .attr("r", bulletRadius)
-          .attr("cy", 0)
-          .attr("cx", (d) => {
-            const width = getTextDimensions(d.name)[0];
-            return rightAlignment ?  bulletPadding : bulletPadding + width
-          })
-          // TODO: there must be a better way than repeating the above code...
-          .datum((d, i) => {
-            const width = getTextDimensions(d.name)[0];
-            return ({
-              cx: (rightAlignment ? bulletPadding : bulletPadding + width),
-              cy: 0,
-              id: d.id,
-              tx: offsetX,
-              ty: i * verticalSpace
-            });
-          });
+      //   // Append circles to the right
+      //   const rightCircles = textElements.append("circle")
+      //     .attr('class', rightAlignment ? circleClassName : null)
+      //     .attr("r", bulletRadius)
+      //     .attr("cy", 0)
+      //     .attr("cx", (d) => {
+      //       const width = getTextDimensions(d.name)[0];
+      //       return rightAlignment ?  bulletPadding : bulletPadding + width
+      //     })
+      //     // TODO: there must be a better way than repeating the above code...
+      //     .datum((d, i) => {
+      //       const width = getTextDimensions(d.name)[0];
+      //       return ({
+      //         cx: (rightAlignment ? bulletPadding : bulletPadding + width),
+      //         cy: 0,
+      //         id: d.id,
+      //         tx: offsetX,
+      //         ty: i * verticalSpace
+      //       });
+      //     });
 
-        // Additional styling if needed
-        textElements.selectAll('circle')
-          .style("fill", colorInactive)
-          .style("opacity", 0)
+      //   // Additional styling if needed
+      //   textElements.selectAll('circle')
+      //     .style("fill", colorInactive)
+      //     .style("opacity", 0)
 
-        // Click event handler
-        function handleClick(d) {
-          const circles = rightAlignment ? leftCircles : rightCircles;
-          const selectedCircle = circles.filter((c) => c.id === d.id);
+      //   // Click event handler
+      //   function handleClick(d) {
+      //     const circles = rightAlignment ? leftCircles : rightCircles;
+      //     const selectedCircle = circles.filter((c) => c.id === d.id);
 
-          selectedCircle.transition()
-            .duration(duration)
-            // Toggle opacity give the current opacity
-            .style("opacity", function () {
-              return d3.select(this).style("opacity") === "0" ? 1 : 0;
-            });
-        }
+      //     selectedCircle.transition()
+      //       .duration(duration)
+      //       // Toggle opacity give the current opacity
+      //       .style("opacity", function () {
+      //         return d3.select(this).style("opacity") === "0" ? 1 : 0;
+      //       });
+      //   }
 
-        // Mouseover event handler
-        function handleMouseOver(d) {
-          // Change the color on hover
-          d3.selectAll('path.branch2party')
-            .filter((c) => c.branch === d.id || c.party === d.id)
-            .attr('stroke', colorActive)
-          d3.select(this).selectAll("circle")
-            .style("fill", colorActive);
-          d3.select(this).selectAll("text")
-            .style("font-weight", "bold");
-        }
+      //   // Mouseover event handler
+      //   function handleMouseOver(d) {
+      //     // Change the color on hover
+      //     d3.selectAll('path.branch2party')
+      //       .filter((c) => c.branch === d.id || c.party === d.id)
+      //       .attr('stroke', colorActive)
+      //     d3.select(this).selectAll("circle")
+      //       .style("fill", colorActive);
+      //     d3.select(this).selectAll("text")
+      //       .style("font-weight", "bold");
+      //   }
 
-        // Mouseout event handler
-        function handleMouseOut(d) {
-          // Restore the color on mouseout
-          d3.selectAll('path.branch2party')
-            .filter((c) => c.branch === d.id || c.party === d.id)
-            .attr('stroke', colorInactive)
-          d3.select(this).selectAll("circle")
-            .style("fill", colorInactive);
-          d3.select(this).selectAll("text")
-            .style("font-weight", "normal");
-        }
-      }; // END drawNodes
+      //   // Mouseout event handler
+      //   function handleMouseOut(d) {
+      //     // Restore the color on mouseout
+      //     d3.selectAll('path.branch2party')
+      //       .filter((c) => c.branch === d.id || c.party === d.id)
+      //       .attr('stroke', colorInactive)
+      //     d3.select(this).selectAll("circle")
+      //       .style("fill", colorInactive);
+      //     d3.select(this).selectAll("text")
+      //       .style("font-weight", "normal");
+      //   }
+      // }; // END drawNodes
 
       // DEF: constructTreeRepresentation -------------------------------------
 
@@ -197,11 +200,11 @@ export function LobbyOrg() {
           "children": id_trees.map((id_tree) => {
             const [node] = nodes.filter((n) => n.id === id_tree.root_id);
             return ({
-              // level-1: branch
+              // level-1: node (i.e. branch or party)
               "id": node.id,
               "name": node.name,
-              "category": node.category, // will always be "branch"
-              // level-2: organizations affiliated with branch
+              "category": node.category,
+              // level-2: leaves affiliated with nodes (i.e. orgs/parls for branch/party)
               "children": leaves.filter(
                 (leaf) => id_tree.children_id.includes(leaf.id)
               )
@@ -224,6 +227,7 @@ export function LobbyOrg() {
         root.descendants().forEach((d) => {
           d.id = d.data.id;
           d._children = d.children;
+           // NOTE: dont get confused with height, its from tree, TODO rename to txtWidth
           d.width = getTextDimensions(d.data.name)[0];
         })
 
@@ -236,13 +240,13 @@ export function LobbyOrg() {
           .attr('stroke', colorInactive)
           .attr('stroke-opacity', linkOpacity)
           .attr('stroke-width', bulletRadius)
-          .attr('transform', `translate(${origin.x}, ${origin.y})`);
+          .attr('transform', `translate(${origin.x},${origin.y})`);
 
         const gNode = svg
           .append('g')
           .attr('cursor', 'pointer')
           .attr('pointer-events', 'all')
-          .attr('transform', `translate(${origin.x}, ${origin.y})`);
+          .attr('transform', `translate(${origin.x},${origin.y})`);
 
         update(root);
 
@@ -295,11 +299,6 @@ export function LobbyOrg() {
               if (d.depth !== 1) return;
               d.children = d.children ? null : d._children;
               update(d);
-            })
-            .datum((d) => {
-              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
-              d.offset = offset;
-              return d;
             });
 
           // inner circles
@@ -308,8 +307,7 @@ export function LobbyOrg() {
             .filter((d) => d.depth !== 0) // do not add inner circles to roots
             .attr('class', (d) => d.depth === 1 ? nodeLabel : null)
             .attr('r', bulletRadius)
-            // .attr('fill', colorFG)
-            .attr('fill', 'red')
+            .attr('fill', colorFG)
             .attr('stroke-width', bulletRadius);
 
           // labels
@@ -322,10 +320,9 @@ export function LobbyOrg() {
             .attr('dx', (growLeft ? -1 : 1) * bulletPadding)
             .clone(true)
             .lower()
-            // TODO: somehow styles the end of paths/lines, make consistent with other paths
             .attr('stroke-linejoin', 'round')
             .attr('stroke-width', bulletRadius)
-            .attr('stroke', colorBG)
+            .attr('stroke', colorBG);
 
           // outer circle
           nodeEnter
@@ -333,9 +330,7 @@ export function LobbyOrg() {
             // do not add outer circles to leaves
             .filter((d) => d.depth !== 2) 
             // do not add outer circles to leaves or nodes without children
-            .filter((d) =>
-              !(d.data.children !== null && d.data.children.length === 0)
-            ) 
+            .filter((d) => !(d.data.children !== null && d.data.children.length === 0))
             .attr('r', bulletRadius)
             .attr('cx', (d) => (growLeft ? -1 : 1) * (2 * bulletPadding + d.width))
             .attr('fill', colorFG)
@@ -378,7 +373,7 @@ export function LobbyOrg() {
             .append('path')
             .attr('d', (d) => {
               const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
-              const o = { x: source.x, y: source.y + offset};
+              const o = { x: source.x, y: source.y + offset };
               return diagonal({ source: o, target: o });
             });
 
@@ -388,8 +383,8 @@ export function LobbyOrg() {
             .transition(transition)
             .attr('d', (d) => {
               const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + d.source.width);
-              const s = { x: d.source.x, y: d.source.y + offset};
-              const t = { x: d.target.x , y: d.target.y};
+              const s = { x: d.source.x, y: d.source.y + offset };
+              const t = { x: d.target.x, y: d.target.y          };
               return diagonal({ source: s, target: t });
             });
 
@@ -400,7 +395,7 @@ export function LobbyOrg() {
             .remove()
             .attr('d', (d) => {
               const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
-              const o = { x: source.x, y: source.y + offset};
+              const o = { x: source.x, y: source.y + offset };
               return diagonal({ source: o, target: o });
             });
 
@@ -463,10 +458,10 @@ export function LobbyOrg() {
 
       // nodes
       const getNodesByCategory = (c) => data.nodes.filter((n) => n.category === c);
-      const branches = getNodesByCategory('branch');
-      const organizations = getNodesByCategory('org');
-      const parties = getNodesByCategory('party');
-      const parls = getNodesByCategory('parl');
+      const branches      = getNodesByCategory('branch'); // branch of organizations
+      const organizations = getNodesByCategory('org');    // lobby organizations
+      const parties       = getNodesByCategory('party');  // political parties
+      const parls         = getNodesByCategory('parl');   // parliamentarians
 
       // edge data
       const branch2party = data.branch2party_edges;
@@ -481,20 +476,17 @@ export function LobbyOrg() {
         data.party2parl_idtrees, parties, parls
       );
 
+      // tree origins
+      const originBranch2org = { 
+        x:  horizontalIndentationBranch2org, y: height / 2
+      };
+
+      const originParty2parl = {
+        x:  horizontalIndentationParty2parl, y: height / 2
+      }
+
       // DRAW -----------------------------------------------------------------
 
-      const max_cols = 5;
-      const dx = minSpace;
-      const dy = Math.max(width / 3, minSpace);
-
-      const originBranch2org = { 
-        x:  (3 / max_cols) * width,
-        y: height / 2
-      };
-      const originParty2parl = {
-        x:  (2 / max_cols) * width,
-        y: height / 2
-      }
 
       drawTree(treeRepBranch2org, originBranch2org, dx, dy, 'left', 'branch', 'org');
       drawTree(treeRepParty2parl, originParty2parl, dx, dy, 'right', 'party', 'parl');
@@ -513,15 +505,16 @@ export function LobbyOrg() {
 
     } // END drawVisualization
 
+    // HELPER -----------------------------------------------------------------
+
     // Function to calculate text width dynamically
     function getTextDimensions(text) {
       const offScreenSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       document.body.appendChild(offScreenSvg);
-      const dummyText = d3.select(offScreenSvg)
-        .append("text").text(text).style('font', fontStyle).node();
+      const dummyText = d3.select(offScreenSvg).append("text").text(text).style('font', fontStyle).node();
       const width = dummyText.getBBox().width;
       const height = dummyText.getBBox().height;
-      offScreenSvg.remove(); // Remove the off-screen SVG from the DOM
+      offScreenSvg.remove();
       return [width, height];
     }
 
