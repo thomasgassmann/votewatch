@@ -354,12 +354,15 @@ export function LobbyOrg() {
           // outer circle
           nodeEnter
             .append('circle')
-            .filter((d) => d.depth !== 2) // do not add outer circles to leaves
-            .filter((d) => d.children === null && d._children === null) // do not add outer circles to leaves
+            // do not add outer circles to leaves
+            .filter((d) => d.depth !== 2) 
+            // do not add outer circles to leaves or nodes without children
+            .filter((d) => 
+              !(d.data.children !== null && d.data.children.length === 0)
+              ) 
             .attr('r', bulletRadius)
             .attr('cx', (d) => {
-              const width = getTextDimensions(d.data.name)[0];
-              return (growLeft ? -1 : 1) * (2 * bulletPadding + width);
+              return (growLeft ? -1 : 1) * (2 * bulletPadding + d.width);
             })
             .attr('fill', colorFG)
             .attr('stroke-width', bulletRadius);
@@ -379,8 +382,7 @@ export function LobbyOrg() {
             .transition(transition)
             .remove()
             .attr('transform', (d) => {
-              const width = getTextDimensions(source.data.name)[0];
-              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + width);
+              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
               return `translate(${source.y + offset},${source.x})`;
             })
             // make invisivble on exit
@@ -419,8 +421,7 @@ export function LobbyOrg() {
             .merge(linkEnter)
             .transition(transition)
             .attr('d', (d) => {
-              const width = getTextDimensions(d.source.data.name)[0];
-              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + width);
+              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + d.source.width);
               const s = { x: d.source.x, y: d.source.y + offset};
               const t = { x: d.target.x , y: d.target.y};
               return diagonal({ source: s, target: t });
@@ -432,8 +433,7 @@ export function LobbyOrg() {
             .transition(transition)
             .remove()
             .attr('d', (d) => {
-              const width = getTextDimensions(source.data.name)[0];
-              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + width);
+              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
               const o = { x: source.x, y: source.y + offset};
               return diagonal({ source: o, target: o });
             });
