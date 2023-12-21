@@ -53,7 +53,7 @@ export function LobbyOrg() {
         ])
         .style('width', '100%')
         .style('font', fontStyle)
-        .style('border', borderStyle)
+        //.style('border', borderStyle)
         .style('user-select', 'none');
 
       // DEF: drawNodes -------------------------------------------------------
@@ -146,7 +146,7 @@ export function LobbyOrg() {
 
           selectedCircle.transition()
             .duration(duration)
-            // Toggle opacity give the current opacity 
+            // Toggle opacity give the current opacity
             .style("opacity", function () {
               return d3.select(this).style("opacity") === "0" ? 1 : 0;
             });
