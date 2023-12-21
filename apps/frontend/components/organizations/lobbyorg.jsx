@@ -416,13 +416,11 @@ export function LobbyOrg() {
           .attr('stroke-opacity', linkOpacity)
           .attr('stroke-width', bulletRadius);
 
-        // Update the links…
         const link = gLink
           .selectAll('path')
           .data(links, (d) => d.target.id)
           .attr('class', linkClass);
 
-        // enter any new links at the parent's previous position
         const linkEnter = link
           .enter()
           .append('path')
