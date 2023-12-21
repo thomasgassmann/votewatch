@@ -6,6 +6,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { useRouter } from "next/navigation";
 import { getAllParliamentarians } from "./getbills";
 import { Bill, LobbyOrganization, Parliamentarian } from "@votewatch/database";
+import { useEffect, useRef } from "react";
 
 interface SearchBoxProps {
   parlamentarians: Parliamentarian[],
@@ -16,8 +17,14 @@ export default function SearchBox({ parlamentarians, bills, lobbyOrganizations}:
 
   const router = useRouter();
 
-  return  (<Command className="rounded-lg border shadow-md">
-  <CommandInput placeholder="Search a person, organization or bill" />
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (ref) ref.current?.focus()
+  }, [ref])
+
+  return  (<Command className="rounded-lg border shadow-md" >
+  <CommandInput placeholder="Search a person, organization or bill" ref={ref} />
   <CommandList>
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandGroup heading="Categories">
