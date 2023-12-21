@@ -12,7 +12,8 @@ export type CommitteeEntry = {
 export type BillEntry = {
   title: string;
   billText: string;
-  voteResult: 'YES' | 'NO' | 'UNKNOWN'
+  voteResult: 'YES' | 'NO' | 'UNKNOWN';
+  finalVoteResult: 'YES' | 'NO' | 'UNKNOWN';
 };
 
 export type OrganizationEntry = {

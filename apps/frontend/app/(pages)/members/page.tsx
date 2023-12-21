@@ -40,7 +40,8 @@ export default async function MembersPage() {
     bills: x.votes.map(v => ({
       title: v.bill.title,
       billText: "",
-      voteResult: v.voteStatus
+      voteResult: v.voteStatus,
+      finalVoteResult: v.bill.voteResult
     })),
     partyFullName: x.party.fullName,
     partyShortName: x.party.shortName,
