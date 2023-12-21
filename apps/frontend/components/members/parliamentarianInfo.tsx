@@ -1,7 +1,7 @@
 import { Parliamentarian } from "./council";
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { CardContent, Card, CardHeader } from "@/components/ui/card"
+import { CardContent, Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs"
 import Link from "next/link"
@@ -114,12 +114,41 @@ export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian,
         </TabsContent>
         <TabsContent className="p-1" value="votes">
           {
-            entry && entry.bills.map(x =>
-              <div key={x.title} className="mb-4 block">
-                <h3 className="mr-2 inline text-lg font-semibold">{x.title}</h3>
-                {/*<p className="text-sm text-gray-500 dark:text-gray-400">{x.billText}</p>*/}
-                <Badge className="inline">{x.voteResult}</Badge>
-              </div>)
+            entry && <ul className="grid gap-6"> {entry.bills.map(x =>
+              <li key={x.title}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{x.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div>
+                      Councilor Vote:{" "}
+                      {x.voteResult === 'YES' && <Badge className="bg-green-200 text-green-800" variant="outline">
+                        Yes
+                      </Badge>}
+                      {x.voteResult === 'NO' && <Badge className="bg-red-200 text-red-800" variant="outline">
+                        No
+                      </Badge>}
+                      {x.voteResult === 'UNKNOWN' && <Badge className="bg-red-200 text-red-800" variant="outline">
+                        Unknown
+                      </Badge>}
+                    </div>
+                    <div>
+                      Final Vote:{" "}
+                      {x.finalVoteResult === 'YES' && <Badge className="bg-green-200 text-green-800" variant="outline">
+                        Yes
+                      </Badge>}
+                      {x.finalVoteResult === 'NO' && <Badge className="bg-red-200 text-red-800" variant="outline">
+                        No
+                      </Badge>}
+                      {x.finalVoteResult === 'UNKNOWN' && <Badge className="bg-red-200 text-red-800" variant="outline">
+                        Unknown
+                      </Badge>}
+                    </div>
+                  </CardContent>
+                </Card>
+              </li>)}
+            </ul>
           }
           {
             (!entry || entry.bills.length === 0) && <p className="text-center">No information for this councilor.</p>
