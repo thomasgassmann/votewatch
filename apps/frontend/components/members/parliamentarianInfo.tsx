@@ -7,6 +7,7 @@ import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs"
 import Link from "next/link"
 import { FC } from "react";
 import { OrganizationEntry, ParliamentarianEntry } from "./parliamentarians";
+import LobbyStrengthExplaination from "./lobby-strength-explaination";
 
 export type ParliamentarianProps = {
   parliamentarian: Parliamentarian;
@@ -99,7 +100,7 @@ export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian,
                             {x.influenceLevel}
                           </Badge>
                           <p className="mt-2 text-sm">
-                            <Link href="https://lobbywatch.ch/de/seite/wirksamkeit">How to interpret the influence level?</Link>
+                            <LobbyStrengthExplaination />
                           </p>
                           {x.vergueting && <p className="text-gray-700 dark:text-gray-300">Vergütung: {x.vergueting}</p>}
                         </CardContent>
