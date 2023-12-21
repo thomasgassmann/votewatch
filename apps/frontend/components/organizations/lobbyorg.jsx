@@ -29,9 +29,6 @@ export function LobbyOrg() {
 
     const margin = {top: 25, right: 25, bottom: 25, left: 25};
 
-    const width = 500;
-    const height = 500;
-
     const minSpace = 45;
     const maxSpace = 50;
 
@@ -251,10 +248,9 @@ export function LobbyOrg() {
       const drawTree = (data, initX, initY, dx, dy, growDirection) => {
         const growLeft = growDirection === 'left';
 
+        const tree = d3.tree().nodeSize([dx, dy]);
         const root = d3.hierarchy(data);
         root.sort((a, b) => a.data.name.localeCompare(b.data.name));
-        const tree = d3.tree().nodeSize([dx, dy]);
-        const diagonal = d3.linkHorizontal().x((d) => d.y).y((d) => d.x);
 
         // TODO: adapt to plot
         root.x0 = initX;
@@ -301,13 +297,11 @@ export function LobbyOrg() {
             if (node.x > right.x) right = node;
           })
 
-          const height = right.x - left.x + margin.top + margin.bottom;
+          // const height = right.x - left.x + margin.top + margin.bottom;
 
           const transition = svg
             .transition()
-            .duration(duration)
-            // TODO: maybe adapt
-            // .attr("viewBox", [left.y - margin.left, left.x - margin.top, width, height])
+            .duration(duration);
 
           const node = gNode
             .selectAll('g')
