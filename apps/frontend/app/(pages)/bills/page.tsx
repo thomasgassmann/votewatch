@@ -3,7 +3,6 @@ import { PageShell } from '@/components/shell';
 import { PageHeader } from '../../../components/header';
 import { getallTop3 } from '../../../components/Bill_by_bill_util';
 import { useState, useEffect } from 'react';
-import { Bill } from '@prisma/client';
 import { loadbills, getParliamentarianById, loadBillVoteresbyid, getOrganizationById } from '../../../components/getbills';
 import { CardHeader, CardContent, Card } from "@/components/ui/card"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
