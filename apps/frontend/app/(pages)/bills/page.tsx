@@ -112,7 +112,7 @@ export default function BillsPageLoading() {
         </Select>
       </form>
 
-      <main className="min-h-screen bg-gray-50 p-4">
+      <main className="min-h-screen">
         <Card className="mb-4">
           <CardHeader>
             <div className="flex items-center">
