@@ -4,8 +4,24 @@ import * as d3 from "d3";
 import { useEffect } from "react";
 
 import dummyData from "../../assets/lobbyorg-fakedata/network_debug.json";
+import { useTheme  } from "next-themes"
 
 export function LobbyOrg() {
+
+  const { resolvedTheme  } = useTheme();
+  const darkMode = resolvedTheme === 'dark'; // dark native :^)
+
+  const colorLight = '#FFF';
+  const colorDark = '#000';
+  const colorLightInactive = "#555"
+  const colorLightActive = "#DD3333"
+  const colorDarkInactive = "#aaa"
+  const colorDarkActive = "#22aaff"
+
+  const colorFG = darkMode ? colorLight : colorDark;
+  const colorBG = darkMode ? colorDark : colorLight;
+  const colorActive = darkMode ? colorDarkActive : colorLightActive;
+  const colorInactive = darkMode ? colorDarkInactive : colorLightInactive;
 
   useEffect(() => {
 
@@ -22,12 +38,7 @@ export function LobbyOrg() {
     const bulletRadius = 1;
     const bulletPadding = 7;
 
-    // TODO adapt color scheme to dark/light mode of website
-    // TODO: rename to colorFg and colorBg
-    const colorFG = '#000'
-    const colorBG = '#FFF'
-    const colorInactive = "#555"
-    const colorActive = "#DD3333"
+    const linkOpacity = 0.75;
 
     const fontStyle = '14px sans-serif';
     const borderStyle = `3px solid ${colorFG}`;
@@ -45,16 +56,14 @@ export function LobbyOrg() {
     const drawVisualization = (data) => {
 
       const svg = d3.create("svg")
-        .attr('width', width)
-        .attr('height', height)
-        // .attr("viewBox", [-margin.left, -margin.top, width+margin.right, height+margin.bottom])
+        .attr('width', '100%')
+        .attr('height', '83vh')
+        .style('font', fontStyle)
+        .style('border', borderStyle)
+        .style('user-select', 'none');
         .attr('viewBox', [
           -margin.left, -margin.bottom, width+margin.right, height+margin.top
-        ])
-        .style('width', '100%')
-        .style('font', fontStyle)
-        //.style('border', borderStyle)
-        .style('user-select', 'none');
+        ]);
 
       // DEF: drawNodes -------------------------------------------------------
 
