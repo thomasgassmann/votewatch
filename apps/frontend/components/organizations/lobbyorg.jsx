@@ -267,7 +267,7 @@ export function LobbyOrg() {
           .append('g')
           .attr('fill', 'none')
           .attr('stroke', colorInactive)
-          .attr('stroke-opacity', 0.4)
+          .attr('stroke-opacity', linkOpacity)
           .attr('stroke-width', bulletRadius)
           .attr('transform', `translate(${initX}, ${initY})`);
 
@@ -440,6 +440,55 @@ export function LobbyOrg() {
         } // END update
       }; // END drawTree
 
+      // DEF: drawEdges -------------------------------------------------------
+
+      const drawLinks = (links, leftOrigin, rightOrigin, leftCircles, rightCircles, linkClass) => {
+
+        const gLink = svg
+          .append('g')
+          .attr('fill', 'none')
+          .attr('stroke', colorInactive)
+          .attr('stroke-opacity', linkOpacity)
+          .attr('stroke-width', bulletRadius);
+
+        // Update the links…
+        const link = gLink
+          .selectAll('path')
+          .data(links, (d) => d.target.id)
+          .attr('class', linkClass);
+
+        // enter any new links at the parent's previous position
+        const linkEnter = link
+          .enter()
+          .append('path')
+          .attr('d', (d) => {
+            const lc = leftCircles.filter((c) => c.data.id === d.source).datum();
+            const rc = rightCircles.filter((c) => c.data.id === d.target).datum();
+            const s = { x: leftOrigin.y + lc.x, y: leftOrigin.x + lc.y };
+            const t = { x: rightOrigin.y + rc.x, y: rightOrigin.x + rc.y };
+            return diagonal({ source: s, target: t });
+          })
+          .attr('fill', 'none')
+          .attr('stroke', colorInactive)
+          .attr('stroke-width', bulletRadius)
+          .each((d) => { 
+            // const id_closure = (node) => {
+            //   node.chi
+            // }
+            d.reachable = {
+              'org': [], // recursive aggregate closure of reachable isd
+              'parl': [] // recursive aggregate closure of reachable isd
+            };
+            return d;
+          })
+          // .on("click", (e, d) => handleClick(d))
+          // .on("mouseover", (e, d) => {
+          //   d.k
+          // })
+          // .on("mouseout", (e, d) => handleMouseOut(d));
+
+      }; // END drawLinks
+
       // SETUP ----------------------------------------------------------------
 
       // nodes
@@ -464,21 +513,26 @@ export function LobbyOrg() {
 
       // DRAW -----------------------------------------------------------------
 
-      // // middle part of graph (branch2party)
-      // drawNodes(branches, (6/7 * width) / 2, 'right', 'branch');
-      // drawNodes(parties, (8/7 * width) / 2, 'left', 'party');
-
-      // const branchCircles = svg.selectAll('circle.branch');
-      // const partyCircles = svg.selectAll('circle.party');
-
-      // drawEdges(branch2party, branchCircles, partyCircles, 'branch2party');
-
-      const max_cols = 4
+      const max_cols = 5;
       const dx = minSpace;
       const dy = Math.max(width / 3, minSpace);
 
-      drawTree(branch2org_treeRep, 3 * width / max_cols, height / 2, dx, dy, 'left');
-      drawTree(party2parl_treeRep, 1 * width / max_cols, height / 2, dx, dy, 'right');
+      const originBranch2org = { 
+        x:  (3 / max_cols) * width,
+        y: height / 2
+      };
+      const originParty2parl = {
+        x:  (2 / max_cols) * width,
+        y: height / 2
+      }
+
+      drawTree(treeRepBranch2org, originBranch2org, dx, dy, 'left', 'branch', 'org');
+      drawTree(treeRepParty2parl, originParty2parl, dx, dy, 'right', 'party', 'parl');
+
+      const branchCircles = svg.selectAll('circle.branch');
+      const partyCircles = svg.selectAll('circle.party');
+
+      drawLinks(branch2party, originBranch2org, originParty2parl, branchCircles, partyCircles, 'branch2party');
 
       const br = svg.selectAll('circle.branch');
       // UPDATE ---------------------------------------------------------------
