@@ -118,7 +118,6 @@ export function LobbyOrg() {
           // Alignment of the text
           .style("text-anchor", rightAlignment ? 'end' : 'start');
 
-
         // Append circles to the right
         const rightCircles = textElements.append("circle")
           .attr('class', rightAlignment ? circleClassName : null)
@@ -323,6 +322,11 @@ export function LobbyOrg() {
               if (d.depth !== 1) return;
               d.children = d.children ? null : d._children;
               update(d);
+            })
+            .datum((d) => {
+              const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
+              d.offset = offset;
+              return d;
             });
 
           // inner circles
@@ -464,7 +468,7 @@ export function LobbyOrg() {
           .attr('d', (d) => {
             const lc = leftCircles.filter((c) => c.data.id === d.source).datum();
             const rc = rightCircles.filter((c) => c.data.id === d.target).datum();
-            const s = { x: leftOrigin.y + lc.x, y: leftOrigin.x + lc.y };
+            const s = { x: leftOrigin.y  + lc.x, y: leftOrigin.x  + lc.y };
             const t = { x: rightOrigin.y + rc.x, y: rightOrigin.x + rc.y };
             return diagonal({ source: s, target: t });
           })
@@ -501,12 +505,12 @@ export function LobbyOrg() {
       // edge data
       const branch2party = data.branch2party_edges;
 
-      const branch2org_treeRep = constructTreeRepresentation(
+      const treeRepBranch2org = constructTreeRepresentation(
         dummyRootId, dummyRootName, dummyRootCategory,
         data.branch2org_idtrees, branches, organizations
       );
 
-      const party2parl_treeRep = constructTreeRepresentation(
+      const treeRepParty2parl = constructTreeRepresentation(
         dummyRootId, dummyRootName, dummyRootCategory,
         data.party2parl_idtrees, parties, parls
       );
@@ -534,7 +538,6 @@ export function LobbyOrg() {
 
       drawLinks(branch2party, originBranch2org, originParty2parl, branchCircles, partyCircles, 'branch2party');
 
-      const br = svg.selectAll('circle.branch');
       // UPDATE ---------------------------------------------------------------
 
       // Remove the existing SVG element
