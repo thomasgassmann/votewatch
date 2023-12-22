@@ -8,7 +8,7 @@ export default function OrganizationPageLoading() {
     <PageShell>
       <PageHeader
         heading="Organiziations"
-        text="Explore different Lobby Organizations"
+        text="Explore sectors of the economy, industry and politics that are active in lobbying."
       />
       <div className="grid gap-10">
         <CardSkeleton />

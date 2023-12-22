@@ -44,11 +44,10 @@ export function MainNav({ items, children }: MainNavProps) {
         <NavigationMenu>
           <NavigationMenuList>
             {items?.map((item, index) => (
-              <TooltipProvider>
+              <TooltipProvider key={index}>
                 <Tooltip>
 
                     <Link
-                      key={index}
                       href={item.disabled ? "#" : item.href}
                       legacyBehavior
                       passHref
