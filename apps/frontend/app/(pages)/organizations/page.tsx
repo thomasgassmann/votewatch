@@ -16,7 +16,7 @@ import { LobbyOrg } from "../../../components/organizations/lobbyorg"
 
 export const metadata = {
   title: "Organizations",
-  description: "Explore different lobby organizations",
+  description: "Visually explore and uncover lobbying influences from parties to special interest groups.",
 }
 
 export type NetworkNode = {
@@ -103,6 +103,7 @@ export default async function OrganizationsPage() {
   const branch2Party = new Map<number, Set<number>>();
   const branch2PartyStrength = new Map<number, Map<number, number>>();
   let maxStrength = 0;
+
   for (const parliamentarian of parliamentarians) {
     for (const organization of parliamentarian.relatedOrganizations) {
       const org = organizations.find(x => x.id === organization.organizationId)!;
@@ -175,7 +176,7 @@ export default async function OrganizationsPage() {
     <PageShell>
       <PageHeader
         heading="Organiziations"
-        text="Explore different Lobby Organizations"
+        text="Visually explore and uncover lobbying influences from parties to special interest groups."
       />
       <div className="grid gap-10">
         <main className="flex w-full flex-1 flex-col">
