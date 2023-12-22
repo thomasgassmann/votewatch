@@ -199,7 +199,7 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
             .on('click', (e, d) => {
               const id = d.data.id;
               const links = gSvg
-                .selectAll('.party2')
+                .selectAll('.party2party')
                 .filter((l) => l.source.id === id || l.target.id === id);
               const color = links.attr('stroke');
 
