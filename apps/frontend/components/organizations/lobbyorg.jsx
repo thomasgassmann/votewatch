@@ -197,31 +197,15 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
               d.depth === 1 ? nodeLabel : d.depth === 2 ? leafLabel : null
             )
             .on('click', (e, d) => {
-              if (d.depth !== 1) return;
-              d.children = d.children ? null : d._children;
-              update(d);
-            })
-            .on('mouseover', (e, d) => {
-              const id = e.target.id;
-              const links = gSvg
-                .selectAll('path')
-                .filter((l) => l.source.id === id || l.target.id === id)
-                .attr('stroke', colorActive);
-
-              console.log(e);
-              console.log(d);
-              console.log(links);
-            })
-            .on('mouseout', (e, d) => {
               const id = d.data.id;
               const links = gSvg
-                .selectAll('path')
-                .filter((l) => l.source.id === id || l.target.id === id)
-                .attr('stroke', colorInactive);
+                .selectAll('.party2')
+                .filter((l) => l.source.id === id || l.target.id === id);
+              const color = links.attr('stroke');
 
-              console.log(e);
-              console.log(d);
-              console.log(links);
+              links.attr('stroke',
+                color === colorInactive ? colorActive : colorInactive
+              );
             });
 
           // inner circles
