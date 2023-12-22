@@ -245,12 +245,12 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
             </div>
           </div>
         </CardContent>
-        <CardFooter>
+        {/* <CardFooter>
           <Button onClick={() => {
             setHover(null);
             onSelect(hover);
           }}>Show</Button>
-        </CardFooter>
+        </CardFooter> */}
       </Card>
     </div>}
   </>;
