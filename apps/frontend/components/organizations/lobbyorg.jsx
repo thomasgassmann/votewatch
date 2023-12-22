@@ -116,7 +116,7 @@ export function LobbyOrg({ lobbyOrgData }) {
           d.children_id = d.children ? d.children.map((c) => c.id) : [];
           // by default do not expan and of the branch nodes 
           // (because of the amount of organizations)
-          if (d.data.category === 'branch') {
+          if (d.data.category === 'branch' || d.data.category === 'party') {
             d.children = null;
           }
         })
