@@ -114,6 +114,11 @@ export function LobbyOrg({ lobbyOrgData }) {
            // NOTE: dont get confused with height, its from tree, TODO rename to txtWidth
           d.width = getTextDimensions(d.data.name)[0];
           d.children_id = d.children ? d.children.map((c) => c.id) : [];
+          // by default do not expan and of the branch nodes 
+          // (because of the amount of organizations)
+          if (d.data.category === 'branch') {
+            d.children = null;
+          }
         })
 
         // grow tree to left if necessary
