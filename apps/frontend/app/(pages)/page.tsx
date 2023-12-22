@@ -3,7 +3,6 @@ import { Building, PaperclipIcon, User2Icon } from "lucide-react"
 import SearchBox from "@/components/search-box"
 
 import { PageShell } from "../../components/shell"
-import { getAllParliamentarians } from "@/components/getbills"
 import { db } from "@votewatch/database"
 import Link from "next/link"
 
@@ -13,7 +12,7 @@ export const metadata = {
 
 export default async function HomePage() {
 
-  const parliamentarians = await getAllParliamentarians();
+  const parliamentarians = await db.parliamentarian.findMany();
   const bills = await db.bill.findMany({ select: {
     id: true,
     title: true

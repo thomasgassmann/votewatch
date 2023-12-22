@@ -1,87 +1,22 @@
-"use client";
 import { PageShell } from '@/components/shell';
-import { PageHeader } from '../../../components/header';
-import { getallTop3 } from '../../../components/Bill_by_bill_util';
-import { useState, useEffect } from 'react';
-import { loadbills, getParliamentarianById, loadBillVoteresbyid, getOrganizationById } from '../../../components/getbills';
-import { CardHeader, CardContent, Card } from "@/components/ui/card"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { PageHeader } from '@/components/header';
+import { CardHeader, Card, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { BillPie } from '../../../components/drawd3';
-import { Button } from '@/components/ui/button';
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Bill } from '@votewatch/database';
+import { db } from '@votewatch/database';
+import BillSelector from '@/components/bills/BillSelector';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
-export default function BillsPageLoading() {
-  const [bills, setBills] = useState<Bill[]>([]);
-  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
-  const [sponsorname, setSponsorname] = useState<string>('');
-  const [voters, setVoters] = useState<String[][]>([]);
-  const [sponsorTop3, setSponsorTop3] =  useState<String[]>([]);
-  const [sponsorclass, setSponsorclass] = useState<String>();
-  const [yesTop3, setYesTop3] = useState<String[]>([]);
-  const [noTop3, setNoTop3] = useState<String[]>([]);
-  const [yesclass, setYesclass] = useState<String>();
-  const [noclass, setNoclass] = useState<String>();
+export default async function BillsPage() {
 
-
-  useEffect(() => {
-    loadbills().then((data) => {
-      setBills(data);
-    });
-  }, []);
-
-  const handleBillSelect = async (billId: string) => {
-    console.log('handleBillSelect called with billId:', billId);
-    const selected = bills.find((bill) => bill.id === billId);
-
-    if (selected) {
-      const sponsorref = await getParliamentarianById(selected.sponsorId);
-      const votersResult = await loadBillVoteresbyid(selected.id);
-      if (!sponsorref) {
-        throw new Error(`Parliamentarian with id ${selected.sponsorId} not found.`);
-      }
-      const top3 = await getallTop3(sponsorref.id, votersResult[0], votersResult[1])
-
-      const sponsortop3 = String[3];
-      const yestop3 = String[3];
-      const notop3 = String[3]
-
-      //iterate through top3 and get names from ids
-      for (let i = 0; i < 3; i++) {
-        const sponsor = (await getOrganizationById(top3[1][i]))?.name;
-        const yes = (await getOrganizationById(top3[3][i]))?.name;
-        const no = (await getOrganizationById(top3[5][i]))?.name;
-        //save them to the new array
-        sponsortop3[i] = sponsor;
-        yestop3[i] = yes;
-        notop3[i] = no;
-      }
-
-      setSelectedBill(selected || null);
-      setSponsorname(sponsorref.firstName + ' ' + sponsorref.lastName);
-      setVoters(votersResult);
-      setSponsorclass(top3[0] as string);
-      setSponsorTop3(sponsorTop3);
-      setYesclass(top3[2] as string);
-      setYesTop3(yesTop3);
-      setNoclass(top3[4] as string);
-      setNoTop3(noTop3);
+  const billList = await db.bill.findMany({
+    select: {
+      id: true,
+      title: true,
+      voteResult: true
     }
-  };
-
-  useEffect(() => {
-    loadbills().then((data) => {
-      setBills(data);
-    });
-  }, []);
+  });
 
   return (
     <PageShell>
@@ -89,131 +24,33 @@ export default function BillsPageLoading() {
         heading="Bills"
         text="Explore different bills and their lobby influences"
       />
-      <h1 className="text-2xl font-semibold">Bill Data Visualization</h1>
-      <form className="flex items-center">
-        <div className="grid gap-10">
-        </div>
-        <Select
-          onValueChange={(value) => {
-            handleBillSelect(value)
-          }}
-          value={selectedBill?.id || ''}
-        >
-          <SelectTrigger>
-            <SelectValue>Select a bill</SelectValue>
-          </SelectTrigger>
-          <SelectContent side="top">
-            {bills.map((bill) => (
-              <SelectItem key={bill.id} value={bill.id}>
-                {bill.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </form>
+      <div className="flex flex-col items-center gap-4">
+        { false && <BillSelector bills={billList} /> }
+      </div>
 
       <main className="min-h-screen">
-        <Card className="mb-4">
-          <CardHeader>
-            <div className="flex items-center">
-              <h2 className="text-lg font-semibold">Bill Selected: </h2>
-              <Badge className="ml-2">{selectedBill?.title}</Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">Voting Results</h3>
-              {selectedBill && <BillPie data={voters} />}
-            </div>
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">Explaination:</h3>
-              <p className="text-base">On this page you can select any bill that has been voted on in parliament in the proceeding legislature.
-              The classification of the influence levels of a bill&apos;s sponsor, yes or no voters bases itself on a comparison to the median parliamentarian.
-              A low level indicates significantly fewer special interest connections while a high level indicates significantly more.
-              The top three standout special interest connections of a parliamentarian are listed in order of how much they influence the given group more
-              than the median parliamentarian.
-                </p>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="mb-4">
-          <CardHeader>
-            <h2 className="text-lg font-semibold">Bill Sponsor</h2>
-          </CardHeader>
-          <CardContent className="flex items-center space-x-4">
-            <Avatar className="h-12 w-12">
-              <AvatarImage alt="Bill Sponsor" src="/placeholder.svg?height=50&width=50" />
-            </Avatar>
-            <div>
-              <h3 className="font-semibold">{sponsorname}</h3>
-              <p className="text-sm">Special Interest Level: {sponsorclass}</p>
-            </div>
-            <div className="col-span-1 self-start">
-              <ul className="mt-2 list-inside list-disc">
-                <li>{sponsorTop3[0]}</li>
-                <li>{sponsorTop3[1]}</li>
-                <li>{sponsorTop3[2]}</li>
-              </ul>
-            </div>
-            <div className="col-span-3 flex justify-start">
-              <Button className="mt-2">More Details</Button>
-            </div>
-          </CardContent>
-        </Card>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-semibold">&apos;Yes&apos; Voters</h2>
-            </CardHeader>
-            <CardContent>
-              <ul>
-                <li className="mb-2 flex items-center space-x-4">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=50&width=50" />
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold">Special interest influences</p>
-                    <Badge>{yesclass}</Badge>
-                  </div>
-                  <div className="col-span-1 self-start">
-                    <ul className="mt-2 list-inside list-disc">
-                      <li>{yesTop3[0]}</li>
-                      <li>{yesTop3[1]}</li>
-                      <li>{yesTop3[2]}</li>
-                    </ul>
-                  </div>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-semibold">&apos;No&apos; Voters</h2>
-            </CardHeader>
-            <CardContent>
-              <ul>
-                <li className="mb-2 flex items-center space-x-4">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage alt="Voter 1" src="/placeholder.svg?height=50&width=50" />
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold">Special interest influences</p>
-                    <Badge>{noclass}</Badge>
-                  </div>
-                  <div className="col-span-1 self-start">
-                    <ul className="mt-2 list-inside list-disc">
-                      <li>{noTop3[0]}</li>
-                      <li>{noTop3[1]}</li>
-                      <li>{noTop3[2]}</li>
-                    </ul>
-                  </div>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+      <ul className="grid gap-2">
+        {billList.map(bill =>
+          <li key={bill.id}>
+            <Link href={`/bills/${bill.id}`}>
+              <Card className='hover:bg-slate-50'>
+                <CardHeader>
+                  <CardTitle>{bill.title}  <Badge variant="outline" className={
+                    cn("uppercase", {
+                      'text-green-800 border-green-800 bg-green-50': bill?.voteResult === 'YES',
+                      'text-red-800 border-red-800 bg-red-50': bill?.voteResult === 'NO'
+                    })
+                  }>
+                    { bill?.voteResult === 'YES' ? "Angenommen" : "Abgelehnt"}
+                  </Badge></CardTitle>
+                </CardHeader>
+              </Card>
+            </Link>
+          </li>
+        )}
+      </ul>
       </main>
     </PageShell>
   );

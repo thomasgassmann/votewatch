@@ -1,10 +1,9 @@
 "use client";
 
 import { range } from "rambdax";
-import { User, Paperclip, UserIcon} from "lucide-react";
+import { User, Paperclip, UserIcon, Building} from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "./ui/command";
 import { useRouter } from "next/navigation";
-import { getAllParliamentarians } from "./getbills";
 import { Bill, LobbyOrganization, Parliamentarian } from "@votewatch/database";
 import { useEffect, useRef } from "react";
 
@@ -29,7 +28,7 @@ export default function SearchBox({ parlamentarians, bills, lobbyOrganizations}:
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandGroup heading="Categories">
       <CommandItem onSelect={() => router.push('/organizations') }>
-        <User className="mr-2 h-4 w-4" />
+        <Building className="mr-2 h-4 w-4" />
         <span>Organizations</span>
       </CommandItem>
       <CommandItem onSelect={() => router.push('/members') }>
@@ -37,7 +36,7 @@ export default function SearchBox({ parlamentarians, bills, lobbyOrganizations}:
         <span>Parlamentarians</span>
       </CommandItem>
       <CommandItem onSelect={() => router.push('/bills') }>
-        <User className="mr-2 h-4 w-4" />
+        <Paperclip className="mr-2 h-4 w-4" />
         <span>Bills</span>
       </CommandItem>
     </CommandGroup>
@@ -60,7 +59,7 @@ export default function SearchBox({ parlamentarians, bills, lobbyOrganizations}:
     </CommandGroup>
     <CommandGroup heading="Bills">
       {bills.map((bill) => (
-        <CommandItem onSelect={() => router.push(`/bills?id=${bill.id}`)}>
+        <CommandItem onSelect={() => router.push(`/bills/${bill.id}`)}>
         <Paperclip className="mr-2 h-4 w-4" />
           <span>{bill.title}</span>
         </CommandItem>
