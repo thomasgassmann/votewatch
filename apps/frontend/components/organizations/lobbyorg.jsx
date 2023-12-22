@@ -194,6 +194,7 @@ export function LobbyOrg() {
             .append('text')
             .text((d) => d.data.name)
             .attr('text-anchor', growLeft ? 'end' : 'start')
+            .attr('fill', colorFG)
             // TODO: add txtHeight to d, also adapt width to txtWidth
             .attr('dy', (d) => getTextDimensions(d.data.name)[1] / 4)
             .attr('dx', (growLeft ? -1 : 1) * bulletPadding)
@@ -240,16 +241,16 @@ export function LobbyOrg() {
           // Update the links…
           const link = gLink
             .selectAll('path')
-            .data(links, (d) => d.target.id)
-            .attr('class', (d) => {
-              const [x, y] = [d.source.depth, d.target.depth].sort();
-              return (x === 1 && y === 2) ? `${nodeLabel}2${leafLabel}Link` : null;
-            });
+            .data(links, (d) => d.target.id);
 
           // enter any new links at the parent's previous position
           const linkEnter = link
             .enter()
             .append('path')
+            .attr('class', (d) => {
+              const [x, y] = [d.source.depth, d.target.depth].sort();
+              return (x === 1 && y === 2) ? nodeLabel : null;
+            })
             .attr('d', (d) => {
               const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
               const o = { x: source.x, y: source.y + offset };
@@ -323,22 +324,16 @@ export function LobbyOrg() {
             };
             return d;
           })
-          .on('mouseover', (e, d) => {
-            const prev = d3.select(e.target).attr('stroke');
-            d3.select(e.target).attr('stroke', prev === colorInactive ? colorActive : colorInactive);
-            // const link = gSvg.selectAll(`path.${linkClass}`).filter((l) => l.id === e.target.id);
-            console.log(e); 
-            // const link = gSvg.selectAll(`path.${linkClass}`)
-            //   .filter((l) => l.id === d.id);
-            //   .style('stroke', function () {
-            //       return d3.select(this).style("opacity") === "0" ? 1 : 0;
-            //   });
-            // console.log(link);
-          })
-          .on('mouseout', (e, d) => {
-            const prev = d3.select(e.target).attr('stroke');
-            d3.select(e.target).attr('stroke', prev === colorInactive ? colorActive : colorInactive);
+          .on('mouseover', (e) => highlightLinkReachable(e, colorActive))
+          .on('mouseout', (e) => highlightLinkReachable(e, colorInactive))
+          .on('click', (e) => {
+            color = d3.select(e.target).attr('stroke');
+            highlightLinkReachable(e, color === colorInactive ? colorActive : colorInactive)
           });
+
+        // increases z-order, i.e. do not paint over circles
+        const circles = gSvg.selectAll('circle');
+        circles.raise();
 
       }; // END drawLinks
 
@@ -400,56 +395,36 @@ export function LobbyOrg() {
       // Call the zoom behavior on the SVG
       svg.call(zoom);
 
+      // HELPER & HANDLER -----------------------------------------------------
+
+      // calculates text width dynamically
+      function getTextDimensions(text) {
+        const offScreenSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        document.body.appendChild(offScreenSvg);
+        const dummyText = d3.select(offScreenSvg).append("text").text(text).style('font', fontStyle).node();
+        const width = dummyText.getBBox().width;
+        const height = dummyText.getBBox().height;
+        offScreenSvg.remove();
+        return [width, height];
+      }
+
+      function highlightLinkReachable(e, color) {
+        const link = d3.select(e.target).attr('stroke', color).datum();
+        gSvg.selectAll('path.branch')
+          .filter((l) =>
+            link.reachable['org'].includes(l.source.id) ||
+            link.reachable['org'].includes(l.target.id)
+          )
+          .attr('stroke', color);
+        gSvg.selectAll('path.party')
+          .filter((l) =>
+            link.reachable['parl'].includes(l.source.id) ||
+            link.reachable['parl'].includes(l.target.id)
+          )
+          .attr('stroke', color);
+      }
+
     } // END drawVisualization
-
-    // HELPER -----------------------------------------------------------------
-
-    // calculates text width dynamically
-    function getTextDimensions(text) {
-      const offScreenSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      document.body.appendChild(offScreenSvg);
-      const dummyText = d3.select(offScreenSvg).append("text").text(text).style('font', fontStyle).node();
-      const width = dummyText.getBBox().width;
-      const height = dummyText.getBBox().height;
-      offScreenSvg.remove();
-      return [width, height];
-    }
-
-    //   // Click event handler
-    //   function handleClick(d) {
-    //     const circles = rightAlignment ? leftCircles : rightCircles;
-    //     const selectedCircle = circles.filter((c) => c.id === d.id);
-    //     selectedCircle.transition()
-    //       .duration(duration)
-    //       // Toggle opacity give the current opacity
-    //       .style("opacity", function () {
-    //         return d3.select(this).style("opacity") === "0" ? 1 : 0;
-    //       });
-    //   }
-
-    //   // Mouseover event handler
-    //   function handleMouseOver(d) {
-    //     // Change the color on hover
-    //     d3.selectAll('path.branch2party')
-    //       .filter((c) => c.branch === d.id || c.party === d.id)
-    //       .attr('stroke', colorActive)
-    //     d3.select(this).selectAll("circle")
-    //       .style("fill", colorActive);
-    //     d3.select(this).selectAll("text")
-    //       .style("font-weight", "bold");
-    //   }
-
-    //   // Mouseout event handler
-    //   function handleMouseOut(d) {
-    //     // Restore the color on mouseout
-    //     d3.selectAll('path.branch2party')
-    //       .filter((c) => c.branch === d.id || c.party === d.id)
-    //       .attr('stroke', colorInactive)
-    //     d3.select(this).selectAll("circle")
-    //       .style("fill", colorInactive);
-    //     d3.select(this).selectAll("text")
-    //       .style("font-weight", "normal");
-    //   }
 
     drawVisualization(dummyData);
   }, []);
