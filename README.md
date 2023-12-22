@@ -130,12 +130,12 @@ Document here the major milestones of your code and future planned steps.\
   - [x] integration: backend with lobbying dynamics
   - [x] integration: backend with parliamentarian pie
   - [x] implementation: frontend
-- [ ] Milestone 5
-  - [ ] integration: frontend with bill-by-bill
-  - [ ] integration: frontend with lobbying dynamics
-  - [ ] integration: frontend with parliamentarian pie
-- [ ] Milestone 6
-  - [ ] finalize
+- [x] Milestone 5
+  - [x] integration: frontend with bill-by-bill
+  - [x] integration: frontend with lobbying dynamics
+  - [x] integration: frontend with parliamentarian pie
+- [x] Milestone 6
+  - [x] finalize
 
 Create a list subtask.\
 Open an issue for each subtask. Once you create a subtask, link the corresponding issue.\
