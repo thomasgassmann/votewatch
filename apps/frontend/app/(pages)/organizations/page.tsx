@@ -25,32 +25,48 @@ export type NetworkNode = {
   category: 'party' | 'branch' | 'org' | 'parl';
 };
 
+export type Branch2PartyEdge = {
+  source: number;
+  target: number;
+  influence_strength: number;
+};
+
 export type NetworkGraph = {
   nodes: NetworkNode[];
   party2parl_idtrees: {
     root_id: number;
     children_id: number[];
+    influence_strength: number[];
   }[];
   branch2org_idtrees: {
     root_id: number;
     children_id: number[];
+    influence_strength: number[];
   }[];
-  branch2party_edges: {
-    source: number;
-    target: number;
-  }[];
+  branch2party_edges: Branch2PartyEdge[];
 };
 
 export default async function OrganizationsPage() {
   const parliamentarians = await db.parliamentarian.findMany({
+    include: {
+      relatedOrganizations: true
+    }
   });
   const parties = await db.party.findMany({
     include: {
       members: true
     }
   });
-  const branches = await db.interestGroup.findMany();
-  const organizations = await db.lobbyOrganization.findMany();
+  const interestGroups = await db.interestGroup.findMany({
+    include: {
+      lobbyOrganizations: true
+    }
+  });
+  const organizations = await db.lobbyOrganization.findMany({
+    include: {
+      interestsGroups: true
+    }
+  });
 
   let id = 0;
   const parliamentarianIds = new Map<string, number>();
@@ -63,6 +79,41 @@ export default async function OrganizationsPage() {
     partyIds.set(party.id, id++);
   }
 
+  const organizationIds = new Map<string, number>();
+  for (const organization of organizations) {
+    organizationIds.set(organization.id, id++);
+  }
+
+  const branchId = new Map<string, number>();
+  const branchOrgs = new Map<string, number[]>();
+  for (const interestGroup of interestGroups) {
+    branchId.set(interestGroup.branche, id++);
+
+    if (!branchOrgs.has(interestGroup.branche)) {
+      branchOrgs.set(interestGroup.branche, []);
+    }
+
+    const current = branchOrgs.get(interestGroup.branche)!;
+    branchOrgs.set(interestGroup.branche, [
+      ...current,
+      ...interestGroup.lobbyOrganizations.map(x => organizationIds.get(x.id)!)
+    ]);
+  }
+
+  const branch2Party = new Map<number, Set<number>>();
+  for (const parliamentarian of parliamentarians) {
+    for (const organization of parliamentarian.relatedOrganizations) {
+      const org = organizations.find(x => x.id === organization.organizationId)!;
+      const branches = new Set<string>(org.interestsGroups.map(x => x.branche));
+      for (const branch of Array.from(branches.values())) {
+        const currentBranchId = branchId.get(branch)!;
+        const partyId = partyIds.get(parliamentarian.partyId)!;
+        const r = branch2Party.get(currentBranchId) ?? new Set<number>();
+        branch2Party.set(currentBranchId, new Set<number>([...Array.from(r.values()), partyId]));
+      }
+    }
+  }
+
   const graph: NetworkGraph = {
     nodes: parliamentarians.map<NetworkNode>(x => ({
       id: parliamentarianIds.get(x.id)!,
@@ -72,13 +123,35 @@ export default async function OrganizationsPage() {
       id: partyIds.get(x.id)!,
       name: x.fullName,
       category: 'party'
+    }))).concat(organizations.map<NetworkNode>(x => ({
+      id: organizationIds.get(x.id)!,
+      name: x.name,
+      category: 'org'
+    }))).concat(Array.from(branchId.keys()).map<NetworkNode>(x => ({
+      id: branchId.get(x)!,
+      category: 'branch',
+      name: x
     }))),
     party2parl_idtrees: parties.map(x => ({
       root_id: partyIds.get(x.id)!,
-      children_id: x.members.map(p => parliamentarianIds.get(p.id)!)
+      children_id: x.members.map(p => parliamentarianIds.get(p.id)!),
+      influence_strength: x.members.map(p => -1)
     })),
-    branch2org_idtrees: [],
-    branch2party_edges: []
+    branch2org_idtrees: Array.from(branchId.keys()).map(x => {
+      const relatedOrgs = branchOrgs.get(x) ?? [];
+
+      return {
+        root_id: branchId.get(x)!,
+        children_id: relatedOrgs,
+        influence_strength: relatedOrgs.map(x => -1)
+      };
+    }),
+    branch2party_edges: Array.from(branch2Party.keys()).flatMap<Branch2PartyEdge>(x =>
+      Array.from(branch2Party.get(x)!.values()).map<Branch2PartyEdge>(p => ({
+        source: x,
+        target: p,
+        influence_strength: -1
+      })))
   };
 
   // <svg id="fullscreen-svg">

@@ -54,6 +54,7 @@ export function LobbyOrg({ lobbyOrgData }) {
     // DEFINITIONS ------------------------------------------------------------
 
     const drawVisualization = (data) => {
+      console.log(data);
 
       const svg = d3.create("svg")
         .attr('width', '100%')
