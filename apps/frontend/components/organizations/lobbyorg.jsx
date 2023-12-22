@@ -66,125 +66,6 @@ export function LobbyOrg() {
           -margin.left, -margin.bottom, width+margin.right, height+margin.top
         ]);
 
-      // DEF: drawNodes -------------------------------------------------------
-
-      // const drawNodes = (nodes, offsetX, alignment, circleClassName) => {
-      //   const rightAlignment = alignment === 'right';
-
-      //   // TODO: maybe supply as argument similar to offsetX
-      //   // Calculate the vertical space between text elements
-      //   const verticalSpace = Math.min(Math.max(height / nodes.length, minSpace), maxSpace);
-
-      //   // Create a group for the text elements
-      //   const textGroup = svg.append("g");
-
-      //   // Bind data to text elements
-      //   const textElements = textGroup.selectAll("g")
-      //     .data(nodes)
-      //     .enter().append("g")
-      //     .attr("transform", (d, i) =>
-      //       `translate(${offsetX},${i * verticalSpace})`
-      //     )
-      //     .on("click", (e, d) => handleClick(d))
-      //     .on("mouseover", (e, d) => handleMouseOver(d))
-      //     .on("mouseout", (e, d) => handleMouseOut(d));
-
-      //   // Append circles to the left
-      //   const leftCircles = textElements.append("circle")
-      //     .attr('class', rightAlignment ? null : circleClassName)
-      //     .attr('r', bulletRadius)
-      //     .attr('cy', 0)
-      //     .attr('cx', (d) => {
-      //       const width = getTextDimensions(d.name)[0];
-      //       return rightAlignment ? -(bulletPadding + width) : -bulletPadding
-      //     })
-      //     // TODO: there must be a better way than repeating the above code...
-      //     .datum((d, i) => {
-      //       const width = getTextDimensions(d.name)[0];
-      //       return ({
-      //         cx: (rightAlignment ? -(bulletPadding + width) : -bulletPadding),
-      //         cy: 0,
-      //         id: d.id,
-      //         tx: offsetX,
-      //         ty: i * verticalSpace
-      //       });
-      //     });
-
-      //   // Append text elements
-      //   textElements.append("text")
-      //     .text(d => d.name)
-      //     // Adjust horizontal position
-      //     .attr("x", 0)
-      //     // Adjust vertical position for centering
-      //     .attr("y", (d) => getTextDimensions(d.name)[1] / 4)
-      //     // color of text
-      //     .attr('fill', colorFG)
-      //     // Alignment of the text
-      //     .style("text-anchor", rightAlignment ? 'end' : 'start');
-
-      //   // Append circles to the right
-      //   const rightCircles = textElements.append("circle")
-      //     .attr('class', rightAlignment ? circleClassName : null)
-      //     .attr("r", bulletRadius)
-      //     .attr("cy", 0)
-      //     .attr("cx", (d) => {
-      //       const width = getTextDimensions(d.name)[0];
-      //       return rightAlignment ?  bulletPadding : bulletPadding + width
-      //     })
-      //     // TODO: there must be a better way than repeating the above code...
-      //     .datum((d, i) => {
-      //       const width = getTextDimensions(d.name)[0];
-      //       return ({
-      //         cx: (rightAlignment ? bulletPadding : bulletPadding + width),
-      //         cy: 0,
-      //         id: d.id,
-      //         tx: offsetX,
-      //         ty: i * verticalSpace
-      //       });
-      //     });
-
-      //   // Additional styling if needed
-      //   textElements.selectAll('circle')
-      //     .style("fill", colorInactive)
-      //     .style("opacity", 0)
-
-      //   // Click event handler
-      //   function handleClick(d) {
-      //     const circles = rightAlignment ? leftCircles : rightCircles;
-      //     const selectedCircle = circles.filter((c) => c.id === d.id);
-
-      //     selectedCircle.transition()
-      //       .duration(duration)
-      //       // Toggle opacity give the current opacity
-      //       .style("opacity", function () {
-      //         return d3.select(this).style("opacity") === "0" ? 1 : 0;
-      //       });
-      //   }
-
-      //   // Mouseover event handler
-      //   function handleMouseOver(d) {
-      //     // Change the color on hover
-      //     d3.selectAll('path.branch2party')
-      //       .filter((c) => c.branch === d.id || c.party === d.id)
-      //       .attr('stroke', colorActive)
-      //     d3.select(this).selectAll("circle")
-      //       .style("fill", colorActive);
-      //     d3.select(this).selectAll("text")
-      //       .style("font-weight", "bold");
-      //   }
-
-      //   // Mouseout event handler
-      //   function handleMouseOut(d) {
-      //     // Restore the color on mouseout
-      //     d3.selectAll('path.branch2party')
-      //       .filter((c) => c.branch === d.id || c.party === d.id)
-      //       .attr('stroke', colorInactive)
-      //     d3.select(this).selectAll("circle")
-      //       .style("fill", colorInactive);
-      //     d3.select(this).selectAll("text")
-      //       .style("font-weight", "normal");
-      //   }
-      // }; // END drawNodes
 
       // DEF: constructTreeRepresentation -------------------------------------
 
@@ -521,6 +402,42 @@ export function LobbyOrg() {
       offScreenSvg.remove();
       return [width, height];
     }
+
+    //   // Click event handler
+    //   function handleClick(d) {
+    //     const circles = rightAlignment ? leftCircles : rightCircles;
+    //     const selectedCircle = circles.filter((c) => c.id === d.id);
+    //     selectedCircle.transition()
+    //       .duration(duration)
+    //       // Toggle opacity give the current opacity
+    //       .style("opacity", function () {
+    //         return d3.select(this).style("opacity") === "0" ? 1 : 0;
+    //       });
+    //   }
+
+    //   // Mouseover event handler
+    //   function handleMouseOver(d) {
+    //     // Change the color on hover
+    //     d3.selectAll('path.branch2party')
+    //       .filter((c) => c.branch === d.id || c.party === d.id)
+    //       .attr('stroke', colorActive)
+    //     d3.select(this).selectAll("circle")
+    //       .style("fill", colorActive);
+    //     d3.select(this).selectAll("text")
+    //       .style("font-weight", "bold");
+    //   }
+
+    //   // Mouseout event handler
+    //   function handleMouseOut(d) {
+    //     // Restore the color on mouseout
+    //     d3.selectAll('path.branch2party')
+    //       .filter((c) => c.branch === d.id || c.party === d.id)
+    //       .attr('stroke', colorInactive)
+    //     d3.select(this).selectAll("circle")
+    //       .style("fill", colorInactive);
+    //     d3.select(this).selectAll("text")
+    //       .style("font-weight", "normal");
+    //   }
 
     drawVisualization(dummyData);
   }, []);
