@@ -117,37 +117,39 @@ export const ParliamentarianInfo: FC<ParliamentarianProps> = ({ parliamentarian,
           {
             entry && <ul className="grid gap-6"> {entry.bills.map(x =>
               <li key={x.title}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{x.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div>
-                      Councilor Vote:{" "}
-                      {x.voteResult === 'YES' && <Badge className="bg-green-200 text-green-800" variant="outline">
-                        Yes
-                      </Badge>}
-                      {x.voteResult === 'NO' && <Badge className="bg-red-200 text-red-800" variant="outline">
-                        No
-                      </Badge>}
-                      {x.voteResult === 'UNKNOWN' && <Badge className="bg-red-200 text-red-800" variant="outline">
-                        Unknown
-                      </Badge>}
-                    </div>
-                    <div>
-                      Final Vote:{" "}
-                      {x.finalVoteResult === 'YES' && <Badge className="bg-green-200 text-green-800" variant="outline">
-                        Yes
-                      </Badge>}
-                      {x.finalVoteResult === 'NO' && <Badge className="bg-red-200 text-red-800" variant="outline">
-                        No
-                      </Badge>}
-                      {x.finalVoteResult === 'UNKNOWN' && <Badge className="bg-red-200 text-red-800" variant="outline">
-                        Unknown
-                      </Badge>}
-                    </div>
-                  </CardContent>
-                </Card>
+                <Link href={`/bills/${x.id}`}>
+                  <Card className="hover:bg-secondary">
+                    <CardHeader>
+                      <CardTitle>{x.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div>
+                        Councilor Vote:{" "}
+                        {x.voteResult === 'YES' && <Badge className="bg-green-200 text-green-800" variant="outline">
+                          Yes
+                        </Badge>}
+                        {x.voteResult === 'NO' && <Badge className="bg-red-200 text-red-800" variant="outline">
+                          No
+                        </Badge>}
+                        {x.voteResult === 'UNKNOWN' && <Badge className="bg-red-200 text-red-800" variant="outline">
+                          Unknown
+                        </Badge>}
+                      </div>
+                      <div>
+                        Final Vote:{" "}
+                        {x.finalVoteResult === 'YES' && <Badge className="bg-green-200 text-green-800" variant="outline">
+                          Yes
+                        </Badge>}
+                        {x.finalVoteResult === 'NO' && <Badge className="bg-red-200 text-red-800" variant="outline">
+                          No
+                        </Badge>}
+                        {x.finalVoteResult === 'UNKNOWN' && <Badge className="bg-red-200 text-red-800" variant="outline">
+                          Unknown
+                        </Badge>}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               </li>)}
             </ul>
           }

@@ -38,6 +38,7 @@ export default async function MembersPage() {
       name: x.name
     })),
     bills: x.votes.map(v => ({
+      id: v.billId,
       title: v.bill.title,
       billText: "",
       voteResult: v.voteStatus,

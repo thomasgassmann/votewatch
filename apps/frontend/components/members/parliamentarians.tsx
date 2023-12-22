@@ -10,6 +10,7 @@ export type CommitteeEntry = {
 };
 
 export type BillEntry = {
+  id: string;
   title: string;
   billText: string;
   voteResult: 'YES' | 'NO' | 'UNKNOWN';
