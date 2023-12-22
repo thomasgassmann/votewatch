@@ -91,10 +91,8 @@ docker build . -t votewatch
 To run the built image:
 
 ````bash
-docker run -it votewatch
+docker run -p 5173:5173 -it votewatch
 ````
-
-Upon running the app, the database will be initialized by the fetcher (`apps/fetcher`).
 
 Open http://localhost:5173.
 

@@ -1,26 +1,43 @@
 'use client'
 // vim: sw=2
 import * as d3 from "d3";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { useTheme } from "next-themes"
 
-import { useTheme  } from "next-themes"
+let mouseX, mouseY = 0;
 
-export function LobbyOrg({ lobbyOrgData }) {
+if (typeof window !== 'undefined') {
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.pageX;
+    mouseY = e.pageY;
+  });
+}
 
-  const { resolvedTheme  } = useTheme();
+export function LobbyOrg({ lobbyOrgData, orgs }) {
+
+  const { resolvedTheme } = useTheme();
   const darkMode = resolvedTheme === 'dark'; // dark native :^)
 
-  const colorLight         = '#FFF';
-  const colorDark          = '#000';
+  const colorLight = '#FFF';
+  const colorDark = '#000';
   const colorLightInactive = "#555"
-  const colorLightActive   = "#DD3333"
-  const colorDarkInactive  = "#aaa"
-  const colorDarkActive    = "#22aaff"
+  const colorLightActive = "#DD3333"
+  const colorDarkInactive = "#aaa"
+  const colorDarkActive = "#22aaff"
 
-  const colorFG       = darkMode ? colorLight        : colorDark;
-  const colorBG       = darkMode ? colorDark         : colorLight;
-  const colorActive   = darkMode ? colorDarkActive   : colorLightActive;
+  const colorFG = darkMode ? colorLight : colorDark;
+  const colorBG = darkMode ? colorDark : colorLight;
+  const colorActive = darkMode ? colorDarkActive : colorLightActive;
   const colorInactive = darkMode ? colorDarkInactive : colorLightInactive;
+
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
 
@@ -65,7 +82,7 @@ export function LobbyOrg({ lobbyOrgData }) {
         .style('border', borderStyle)
         .style('user-select', 'none')
         .attr('viewBox', [
-          -margin.left, -margin.bottom, width+margin.right, height+margin.top
+          -margin.left, -margin.bottom, width + margin.right, height + margin.top
         ]);
 
       const gSvg = svg.append('g');
@@ -111,7 +128,7 @@ export function LobbyOrg({ lobbyOrgData }) {
         root.descendants().reverse().forEach((d) => {
           d.id = d.data.id;
           d._children = d.children;
-           // NOTE: dont get confused with height, its from tree, TODO rename to txtWidth
+          // NOTE: dont get confused with height, its from tree, TODO rename to txtWidth
           d.width = getTextDimensions(d.data.name)[0];
           d.children_id = d.children ? d.children.map((c) => c.id) : [];
           // by default do not expan and of the branch nodes
@@ -291,7 +308,7 @@ export function LobbyOrg({ lobbyOrgData }) {
             .attr('d', (d) => {
               const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + d.source.width);
               const s = { x: d.source.x, y: d.source.y + offset };
-              const t = { x: d.target.x, y: d.target.y          };
+              const t = { x: d.target.x, y: d.target.y };
               return diagonal({ source: s, target: t });
             });
 
@@ -334,7 +351,7 @@ export function LobbyOrg({ lobbyOrgData }) {
           .attr('d', (d) => {
             const lc = leftCircles.filter((c) => c.data.id === d.source).datum();
             const rc = rightCircles.filter((c) => c.data.id === d.target).datum();
-            const s = { x: leftOrigin.y  + lc.x, y: leftOrigin.x  + lc.y };
+            const s = { x: leftOrigin.y + lc.x, y: leftOrigin.x + lc.y };
             const t = { x: rightOrigin.y + rc.x, y: rightOrigin.x + rc.y };
             return diagonal({ source: s, target: t });
           })
@@ -353,12 +370,19 @@ export function LobbyOrg({ lobbyOrgData }) {
             };
             return d;
           })
-          .on('mouseover', (e) => highlightLinkReachable(e, colorActive))
-          .on('mouseout', (e) => highlightLinkReachable(e, colorInactive));
-          // .on('click', (e) => {
-          //   color = d3.select(e.target).attr('stroke');
-          //   highlightLinkReachable(e, color === colorInactive ? colorActive : colorInactive)
-          // });
+          .on('click', (e, d) => {
+            setSelected(d);
+          })
+          .on('mouseover', (e, d) => {
+            highlightLinkReachable(e, colorActive);
+          })
+          .on('mouseout', (e) => {
+            highlightLinkReachable(e, colorInactive);
+          });
+        // .on('click', (e) => {
+        //   color = d3.select(e.target).attr('stroke');
+        //   highlightLinkReachable(e, color === colorInactive ? colorActive : colorInactive)
+        // });
 
         // increases z-order, i.e. do not paint over circles
         const circles = gSvg.selectAll('circle');
@@ -370,10 +394,10 @@ export function LobbyOrg({ lobbyOrgData }) {
 
       // nodes
       const getNodesByCategory = (c) => data.nodes.filter((n) => n.category === c);
-      const branches      = getNodesByCategory('branch'); // branch of organizations
+      const branches = getNodesByCategory('branch'); // branch of organizations
       const organizations = getNodesByCategory('org');    // lobby organizations
-      const parties       = getNodesByCategory('party');  // political parties
-      const parls         = getNodesByCategory('parl');   // parliamentarians
+      const parties = getNodesByCategory('party');  // political parties
+      const parls = getNodesByCategory('parl');   // parliamentarians
 
       // edge data
       const branch2party = data.branch2party_edges;
@@ -390,11 +414,11 @@ export function LobbyOrg({ lobbyOrgData }) {
 
       // tree origins
       const originBranch2org = {
-        x:  horizontalIndentationBranch2org, y: height / 2
+        x: horizontalIndentationBranch2org, y: height / 2
       };
 
       const originParty2parl = {
-        x:  horizontalIndentationParty2parl, y: height / 2
+        x: horizontalIndentationParty2parl, y: height / 2
       }
 
       // DRAW -----------------------------------------------------------------
@@ -456,10 +480,33 @@ export function LobbyOrg({ lobbyOrgData }) {
     } // END drawVisualization
 
     drawVisualization(lobbyOrgData);
-  }, []);
+  }, [lobbyOrgData, setSelected]);
 
   return (
-    <div id='container' />
+    <>
+      {selected && <Dialog open={selected !== null} onOpenChange={open => {
+        if (!open) {
+          setSelected(null);
+        }
+      }}>
+        <DialogContent className="mb-6">
+          <DialogHeader>
+            <DialogTitle>{lobbyOrgData.nodes.find(x => x.id === selected.source)?.name} - {lobbyOrgData.nodes.find(x => x.id === selected.target)?.name}</DialogTitle>
+            <DialogDescription>
+              Rrelative strength of {selected.influence_strength.toFixed(3)}
+            </DialogDescription>
+          </DialogHeader>
+          <div style={{ paddingLeft: '20px', maxHeight: '60vh', overflowY: 'scroll' }}>
+            <ul className="list-disc">
+              {orgs
+                .filter(x => x.branchIds.indexOf(selected.source) > -1 && x.partyIds.indexOf(selected.target) > -1)
+                .map(x => <li key={x.id}>{x.name}</li>)}
+            </ul>
+          </div>
+        </DialogContent>
+      </Dialog>}
+      <div id='container' />
+    </>
   )
 }
 

@@ -1,10 +1,17 @@
-// @ts-nocheck
-
+//@ts-nocheck
 'use client'
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
 
-export const BillPie = ({data}) => {
+interface BillPieProps {
+  votes: {
+    yesVotes: number;
+    noVotes: number;
+    unknownVotes: number;
+  }
+}
+
+export default function BillPie({ votes }: BillPieProps) {
     const svgRef = useRef<SVGSVGElement>(null);
 
     useEffect(() => {
@@ -23,25 +30,18 @@ export const BillPie = ({data}) => {
                 .append('g') // Append a group element for centering
                 .attr('transform', `translate(${width / 2}, ${height / 2})`); // Center the group element
 
-            // Calculate total votes
-            const yeslength = data[0].length;
-            const nolength = data[1].length;
-            const abstainlength = data[2].length;
-
-
-            const totalVotes = yeslength + nolength + abstainlength;
+            const { yesVotes, noVotes, unknownVotes } = votes;
+            const totalVotes = yesVotes + noVotes + unknownVotes;
 
             // Data for the pie chart
             const pieData = [
-                { label: 'Yes', value: yeslength },
-                { label: 'No', value: nolength},
-                { label: 'Abstain', value: abstainlength },
+                { label: 'Yes', value: yesVotes },
+                { label: 'No', value: noVotes},
+                { label: 'Abstain', value: unknownVotes },
             ];
 
             // Colors for the pie chart
             const colors = ['#4CAF50', '#FF5252', '#B0BEC5']; // Green, Red, Grey
-
-
 
             // Create a pie chart
             const pie = d3.pie().value(d => d.value);
@@ -49,8 +49,8 @@ export const BillPie = ({data}) => {
 
             // Add pie slices
             svg.selectAll('path')
-                .data(pie(pieData))
-                .enter()
+              .data(pie(pieData))
+              .enter()
                 .append('path')
                 .attr('d', arc)
                 .attr('fill', (d, i) => colors[i])
@@ -67,7 +67,7 @@ export const BillPie = ({data}) => {
                 .attr('text-anchor', 'middle')
                 .text(d => d.data.value);
         }
-    }, [data]);
+    }, [votes]);
 
     return <svg ref={svgRef} />;
 };
