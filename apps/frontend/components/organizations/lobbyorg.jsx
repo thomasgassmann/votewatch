@@ -3,10 +3,9 @@
 import * as d3 from "d3";
 import { useEffect } from "react";
 
-import dummyData from "../../assets/lobbyorg-fakedata/network_debug.json";
 import { useTheme  } from "next-themes"
 
-export function LobbyOrg() {
+export function LobbyOrg({ lobbyOrgData }) {
 
   const { resolvedTheme  } = useTheme();
   const darkMode = resolvedTheme === 'dark'; // dark native :^)
@@ -204,7 +203,7 @@ export function LobbyOrg() {
           nodeEnter
             .append('circle')
             // do not add outer circles to leaves
-            .filter((d) => d.depth !== 2) 
+            .filter((d) => d.depth !== 2)
             // do not add outer circles to leaves or nodes without children
             .filter((d) => !(d.data.children !== null && d.data.children.length === 0))
             .attr('r', bulletRadius)
@@ -324,7 +323,7 @@ export function LobbyOrg() {
             const prev = d3.select(e.target).attr('stroke');
             d3.select(e.target).attr('stroke', prev === colorInactive ? colorActive : colorInactive);
             // const link = svg.selectAll(`path.${linkClass}`).filter((l) => l.id === e.target.id);
-            console.log(e); 
+            console.log(e);
             // const link = svg.selectAll(`path.${linkClass}`)
             //   .filter((l) => l.id === d.id);
             //   .style('stroke', function () {
@@ -362,7 +361,7 @@ export function LobbyOrg() {
       );
 
       // tree origins
-      const originBranch2org = { 
+      const originBranch2org = {
         x:  horizontalIndentationBranch2org, y: height / 2
       };
 
@@ -439,7 +438,7 @@ export function LobbyOrg() {
     //       .style("font-weight", "normal");
     //   }
 
-    drawVisualization(dummyData);
+    drawVisualization(lobbyOrgData);
   }, []);
 
   return (
