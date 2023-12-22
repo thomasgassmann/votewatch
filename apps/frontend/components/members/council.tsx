@@ -230,6 +230,7 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
     <div ref={svgContainer} className="h-[450px] w-full">
       <svg ref={svgRef} />
     </div>
+    <p className="text-lg text-muted-foreground">Each tile represents a member of the national council (Nationalrat). The seating reflects the actual seating in the chamber. The lower twelve dots represent (from left to right) the councilors that serve as sepaker, first deputy speaker, second deputy speaker (2x) as well as the scrutineers (8x).</p>
     {hover !== null && <div style={{ position: 'absolute', top: `${hoverPos[1]}px`, left: `${hoverPos[0]}px` }}>
       <Card ref={cardRef} className="mb-6">
         <CardContent className="p-6">
@@ -245,12 +246,12 @@ export const Council: FC<CouncilProps> = ({ onSelect, entries }) => {
             </div>
           </div>
         </CardContent>
-        <CardFooter>
+        {/* <CardFooter>
           <Button onClick={() => {
             setHover(null);
             onSelect(hover);
           }}>Show</Button>
-        </CardFooter>
+        </CardFooter> */}
       </Card>
     </div>}
   </>;
