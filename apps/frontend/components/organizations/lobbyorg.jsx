@@ -3,10 +3,9 @@
 import * as d3 from "d3";
 import { useEffect } from "react";
 
-import dummyData from "../../assets/lobbyorg-fakedata/network_debug.json";
 import { useTheme  } from "next-themes"
 
-export function LobbyOrg() {
+export function LobbyOrg({ lobbyOrgData }) {
 
   const { resolvedTheme  } = useTheme();
   const darkMode = resolvedTheme === 'dark'; // dark native :^)
@@ -57,6 +56,7 @@ export function LobbyOrg() {
     // DEFINITIONS ------------------------------------------------------------
 
     const drawVisualization = (data) => {
+      console.log(data);
 
       const svg = d3.create("svg")
         .attr('width', '100%')
@@ -208,7 +208,7 @@ export function LobbyOrg() {
           nodeEnter
             .append('circle')
             // do not add outer circles to leaves
-            .filter((d) => d.depth !== 2) 
+            .filter((d) => d.depth !== 2)
             // do not add outer circles to leaves or nodes without children
             .filter((d) => !(d.data.children !== null && d.data.children.length === 0))
             .attr('r', bulletRadius)
@@ -360,7 +360,7 @@ export function LobbyOrg() {
       );
 
       // tree origins
-      const originBranch2org = { 
+      const originBranch2org = {
         x:  horizontalIndentationBranch2org, y: height / 2
       };
 
@@ -426,7 +426,7 @@ export function LobbyOrg() {
 
     } // END drawVisualization
 
-    drawVisualization(dummyData);
+    drawVisualization(lobbyOrgData);
   }, []);
 
   return (
