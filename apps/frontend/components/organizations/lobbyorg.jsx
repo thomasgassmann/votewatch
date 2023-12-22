@@ -43,13 +43,15 @@ export function LobbyOrg() {
     const horizontalIndentationBranch2org = (3 / 5) * width;
     const horizontalIndentationParty2parl = (2 / 5) * width;
 
+    const zoomScaleMin = 0.01;
+    const zoomScaleMax = 10.0;
+
     // DO NOT CHANGE  ---------------------------------------------------------
 
     const dummyRootId = -1;
     const dummyRootName = 'dummyRoot';
     const dummyRootCategory = 'dummy';
 
-    const container = d3.select('#container');
     const diagonal = d3.linkHorizontal().x((d) => d.y).y((d) => d.x);
 
     // DEFINITIONS ------------------------------------------------------------
@@ -66,6 +68,7 @@ export function LobbyOrg() {
           -margin.left, -margin.bottom, width+margin.right, height+margin.top
         ]);
 
+      const gSvg = svg.append('g');
 
       // DEF: constructTreeRepresentation -------------------------------------
 
@@ -116,7 +119,7 @@ export function LobbyOrg() {
         // grow tree to left if necessary
         tree(root).each((node) => node.y = (growLeft ? -1 : 1) * node.y);
 
-        const gLink = svg
+        const gLink = gSvg
           .append('g')
           .attr('fill', 'none')
           .attr('stroke', colorInactive)
@@ -124,7 +127,7 @@ export function LobbyOrg() {
           .attr('stroke-width', bulletRadius)
           .attr('transform', `translate(${origin.x},${origin.y})`);
 
-        const gNode = svg
+        const gNode = gSvg
           .append('g')
           .attr('cursor', 'pointer')
           .attr('pointer-events', 'all')
@@ -149,7 +152,7 @@ export function LobbyOrg() {
 
           // const height = right.x - left.x + margin.top + margin.bottom;
 
-          const transition = svg
+          const transition = gSvg
             .transition()
             .duration(duration);
 
@@ -285,7 +288,7 @@ export function LobbyOrg() {
 
       const drawLinks = (links, leftOrigin, rightOrigin, leftCircles, rightCircles, linkClass) => {
 
-        const gLink = svg
+        const gLink = gSvg
           .append('g')
           .attr('fill', 'none')
           .attr('stroke', colorInactive)
@@ -312,8 +315,8 @@ export function LobbyOrg() {
           .attr('stroke-width', bulletRadius)
           .each((d) => {
             const linkIds = [d.source, d.target];
-            const branchNode = svg.selectAll('g.branch').filter((n) => linkIds.includes(n.id)).datum();
-            const partyNode = svg.selectAll('g.party').filter((n) => linkIds.includes(n.id)).datum();
+            const branchNode = gSvg.selectAll('g.branch').filter((n) => linkIds.includes(n.id)).datum();
+            const partyNode = gSvg.selectAll('g.party').filter((n) => linkIds.includes(n.id)).datum();
             d.reachable = {
               'org': branchNode.children_id,
               'parl': partyNode.children_id
@@ -323,9 +326,9 @@ export function LobbyOrg() {
           .on('mouseover', (e, d) => {
             const prev = d3.select(e.target).attr('stroke');
             d3.select(e.target).attr('stroke', prev === colorInactive ? colorActive : colorInactive);
-            // const link = svg.selectAll(`path.${linkClass}`).filter((l) => l.id === e.target.id);
+            // const link = gSvg.selectAll(`path.${linkClass}`).filter((l) => l.id === e.target.id);
             console.log(e); 
-            // const link = svg.selectAll(`path.${linkClass}`)
+            // const link = gSvg.selectAll(`path.${linkClass}`)
             //   .filter((l) => l.id === d.id);
             //   .style('stroke', function () {
             //       return d3.select(this).style("opacity") === "0" ? 1 : 0;
@@ -372,27 +375,36 @@ export function LobbyOrg() {
 
       // DRAW -----------------------------------------------------------------
 
-
       drawTree(treeRepBranch2org, originBranch2org, dx, dy, 'left', 'branch', 'org');
       drawTree(treeRepParty2parl, originParty2parl, dx, dy, 'right', 'party', 'parl');
 
-      const branchCircles = svg.selectAll('circle.branch');
-      const partyCircles = svg.selectAll('circle.party');
+      const branchCircles = gSvg.selectAll('circle.branch');
+      const partyCircles = gSvg.selectAll('circle.party');
 
       drawLinks(branch2party, originBranch2org, originParty2parl, branchCircles, partyCircles, 'branch2party');
 
       // UPDATE ---------------------------------------------------------------
 
+      // add SVG to container
+      const container = d3.select('#container');
       // Remove the existing SVG element
       container.selectAll('svg').remove();
       // Append the updated SVG element
       container.append(() => svg.node());
 
+      // Create a zoom behavior
+      const zoom = d3.zoom()
+        .scaleExtent([zoomScaleMin, zoomScaleMax])
+        .on('zoom', (e) => d3.select('svg g').attr('transform', e.transform));
+
+      // Call the zoom behavior on the SVG
+      svg.call(zoom);
+
     } // END drawVisualization
 
     // HELPER -----------------------------------------------------------------
 
-    // Function to calculate text width dynamically
+    // calculates text width dynamically
     function getTextDimensions(text) {
       const offScreenSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       document.body.appendChild(offScreenSvg);
