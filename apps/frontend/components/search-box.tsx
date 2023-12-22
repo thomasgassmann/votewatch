@@ -49,14 +49,6 @@ export default function SearchBox({ parlamentarians, bills, lobbyOrganizations}:
         </CommandItem>
       ))}
     </CommandGroup>
-    <CommandGroup heading="Organizations">
-      {lobbyOrganizations.map((org) => (
-        <CommandItem onSelect={() => router.push(`/organizations?id=${org.id}`)}>
-          <UserIcon className="mr-2 h-4 w-4" />
-          <span>{ org.name }</span>
-        </CommandItem>
-      ))}
-    </CommandGroup>
     <CommandGroup heading="Bills">
       {bills.map((bill) => (
         <CommandItem onSelect={() => router.push(`/bills/${bill.id}`)}>
