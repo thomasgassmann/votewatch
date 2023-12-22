@@ -101,6 +101,8 @@ export default async function OrganizationsPage() {
   }
 
   const branch2Party = new Map<number, Set<number>>();
+  const branch2PartyStrength = new Map<number, Map<number, number>>();
+  let maxStrength = 0;
   for (const parliamentarian of parliamentarians) {
     for (const organization of parliamentarian.relatedOrganizations) {
       const org = organizations.find(x => x.id === organization.organizationId)!;
@@ -110,47 +112,45 @@ export default async function OrganizationsPage() {
         const partyId = partyIds.get(parliamentarian.partyId)!;
         const r = branch2Party.get(currentBranchId) ?? new Set<number>();
         branch2Party.set(currentBranchId, new Set<number>([...Array.from(r.values()), partyId]));
+        if (!branch2PartyStrength.has(currentBranchId)) {
+          branch2PartyStrength.set(currentBranchId, new Map<number, number>());
+        }
+
+        const currentValue = (branchOrgs.get(branch)?.length ?? 0) +
+        (parties.find(x => x.id === parliamentarian.partyId)?.members.length ?? 0);
+        maxStrength = Math.max(currentValue, maxStrength);
+        branch2PartyStrength.get(currentBranchId)!.set(partyId, currentValue);
       }
     }
   }
 
   const graph: NetworkGraph = {
-    nodes: parliamentarians.map<NetworkNode>(x => ({
-      id: parliamentarianIds.get(x.id)!,
-      name: x.firstName + ' ' + x.lastName,
-      category: 'parl'
-    })).concat(parties.map<NetworkNode>(x => ({
+    nodes: parties.map<NetworkNode>(x => ({
       id: partyIds.get(x.id)!,
       name: x.fullName,
       category: 'party'
-    }))).concat(organizations.map<NetworkNode>(x => ({
-      id: organizationIds.get(x.id)!,
-      name: x.name,
-      category: 'org'
-    }))).concat(Array.from(branchId.keys()).map<NetworkNode>(x => ({
+    })).concat(Array.from(branchId.keys()).map<NetworkNode>(x => ({
       id: branchId.get(x)!,
       category: 'branch',
       name: x
     }))),
     party2parl_idtrees: parties.map(x => ({
       root_id: partyIds.get(x.id)!,
-      children_id: x.members.map(p => parliamentarianIds.get(p.id)!),
-      influence_strength: x.members.map(p => -1)
+      children_id: [],
+      influence_strength: []
     })),
     branch2org_idtrees: Array.from(branchId.keys()).map(x => {
-      const relatedOrgs = branchOrgs.get(x) ?? [];
-
       return {
         root_id: branchId.get(x)!,
-        children_id: relatedOrgs,
-        influence_strength: relatedOrgs.map(x => -1)
+        children_id: [],
+        influence_strength: []
       };
     }),
     branch2party_edges: Array.from(branch2Party.keys()).flatMap<Branch2PartyEdge>(x =>
       Array.from(branch2Party.get(x)!.values()).map<Branch2PartyEdge>(p => ({
         source: x,
         target: p,
-        influence_strength: -1
+        influence_strength: (branch2PartyStrength.get(x)?.get(p) ?? 0) / maxStrength
       })))
   };
 

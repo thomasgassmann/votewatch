@@ -35,7 +35,7 @@ export function LobbyOrg({ lobbyOrgData }) {
     const linkOpacity = 0.75;
     const duration = 250;
     const fontStyle = '14px sans-serif';
-    const borderStyle = `3px solid ${colorFG}`;
+    const borderStyle = `0px solid ${colorFG}`;
 
     const dx = 45;
     const dy = Math.max(width / 3, 45);
@@ -114,9 +114,9 @@ export function LobbyOrg({ lobbyOrgData }) {
            // NOTE: dont get confused with height, its from tree, TODO rename to txtWidth
           d.width = getTextDimensions(d.data.name)[0];
           d.children_id = d.children ? d.children.map((c) => c.id) : [];
-          // by default do not expan and of the branch nodes 
+          // by default do not expan and of the branch nodes
           // (because of the amount of organizations)
-          if (d.data.category === 'branch') {
+          if (d.data.category === 'branch' || d.data.category === 'party') {
             d.children = null;
           }
         })
@@ -318,7 +318,9 @@ export function LobbyOrg({ lobbyOrgData }) {
           })
           .attr('fill', 'none')
           .attr('stroke', colorInactive)
-          .attr('stroke-width', bulletRadius)
+          .attr('stroke-width', (d) => {
+            return d.influence_strength;
+          })
           .each((d) => {
             const linkIds = [d.source, d.target];
             const branchNode = gSvg.selectAll('g.branch').filter((n) => linkIds.includes(n.id)).datum();
@@ -330,11 +332,11 @@ export function LobbyOrg({ lobbyOrgData }) {
             return d;
           })
           .on('mouseover', (e) => highlightLinkReachable(e, colorActive))
-          .on('mouseout', (e) => highlightLinkReachable(e, colorInactive))
-          .on('click', (e) => {
-            color = d3.select(e.target).attr('stroke');
-            highlightLinkReachable(e, color === colorInactive ? colorActive : colorInactive)
-          });
+          .on('mouseout', (e) => highlightLinkReachable(e, colorInactive));
+          // .on('click', (e) => {
+          //   color = d3.select(e.target).attr('stroke');
+          //   highlightLinkReachable(e, color === colorInactive ? colorActive : colorInactive)
+          // });
 
         // increases z-order, i.e. do not paint over circles
         const circles = gSvg.selectAll('circle');
