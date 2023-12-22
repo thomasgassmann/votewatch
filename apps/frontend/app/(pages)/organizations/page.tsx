@@ -46,6 +46,13 @@ export type NetworkGraph = {
   branch2party_edges: Branch2PartyEdge[];
 };
 
+export type Organization = {
+  id: number;
+  name: string;
+  branchIds: number[];
+  partyIds: number[];
+};
+
 export default async function OrganizationsPage() {
   const parliamentarians = await db.parliamentarian.findMany({
     include: {
@@ -64,7 +71,8 @@ export default async function OrganizationsPage() {
   });
   const organizations = await db.lobbyOrganization.findMany({
     include: {
-      interestsGroups: true
+      interestsGroups: true,
+      connectionsToParliament: true
     }
   });
 
@@ -98,6 +106,20 @@ export default async function OrganizationsPage() {
       ...current,
       ...interestGroup.lobbyOrganizations.map(x => organizationIds.get(x.id)!)
     ]);
+  }
+
+  const orgs: Organization[] = [];
+  for (const organisation of organizations) {
+    const relatedParliamentarians = parliamentarians
+      .filter(x => x.relatedOrganizations.some(p => p.organizationId === organisation.id));
+    const relatedPartyIds = relatedParliamentarians.map(x => x.partyId);
+
+    orgs.push({
+      id: organizationIds.get(organisation.id)!,
+      branchIds: organisation.interestsGroups.map(x => branchId.get(x.branche)!),
+      name: organisation.name,
+      partyIds: relatedPartyIds.map(x => partyIds.get(x)!)
+    });
   }
 
   const branch2Party = new Map<number, Set<number>>();
@@ -180,7 +202,7 @@ export default async function OrganizationsPage() {
       />
       <div className="grid gap-10">
         <main className="flex w-full flex-1 flex-col">
-          <LobbyOrg lobbyOrgData={graph} />
+          <LobbyOrg lobbyOrgData={graph} orgs={orgs} />
         </main>
       </div>
     </PageShell>
