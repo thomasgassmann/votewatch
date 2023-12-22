@@ -103,7 +103,7 @@ Open http://localhost:5173.
 1. Run `pnpm install` in the root directory.
 2. Run `docker compose up` in a separate terminal to start the database. All `.env` files should have already been configured.
 3. Run `pnpm run db:generate` as well as `pnpm run db:push` in  `packages/database` to generate the database schema.
-4. Run `pnpm run start` in `packages/fetcher` to execute the fetcher script against the database. This will populate the database with data aggregated from LobbyWatch and the Swiss parliament.
+4. Run `pnpm run start` in `apps/fetcher` to execute the fetcher script against the database. This will populate the database with data aggregated from LobbyWatch and the Swiss parliament.
 5. Run `pnpm run dev` in `apps/frontend` to start the NextJS development server.
 
 ## Milestones
