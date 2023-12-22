@@ -35,7 +35,7 @@ export default async function BillsPage() {
         {billList.map(bill =>
           <li key={bill.id}>
             <Link href={`/bills/${bill.id}`}>
-              <Card className='hover:bg-slate-50'>
+              <Card className='hover:bg-secondary'>
                 <CardHeader>
                   <CardTitle>{bill.title}  <Badge variant="outline" className={
                     cn("uppercase", {
