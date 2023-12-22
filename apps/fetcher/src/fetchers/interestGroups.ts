@@ -5,7 +5,8 @@ type LobbyWatchInterestGroups = {
   id: string;
   anzeige_name: string;
   beschreibung: string;
-  alias_name: string | null;
+  alias_names: string | null;
+  branche: string;
 };
 
 export async function fetchInterestGroups() {
@@ -28,7 +29,8 @@ export async function fetchInterestGroups() {
         id: interestGroup.id,
         name: interestGroup.anzeige_name,
         description: interestGroup.beschreibung,
-        aliasNames: interestGroup.alias_name || "",
+        aliasNames: interestGroup.alias_names || "",
+        branche: interestGroup.branche
       },
     });
   }

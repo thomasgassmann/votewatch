@@ -85,6 +85,7 @@ model InterestGroup {
   name        String
   description String
   aliasNames  String // Alternative names for the interest gorups, seperated by ;
+  branche     String
 
   lobbyOrganizations LobbyOrganization[] //@relation(fields: [lobbyOrganizationId], references: [id])
   //lobbyOrganizationId String?
