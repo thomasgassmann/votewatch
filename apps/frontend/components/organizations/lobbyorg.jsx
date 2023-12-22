@@ -224,11 +224,12 @@ export function LobbyOrg() {
 
         root.x0 = origin.x;
         root.y0 = origin.y;
-        root.descendants().forEach((d) => {
+        root.descendants().reverse().forEach((d) => {
           d.id = d.data.id;
           d._children = d.children;
            // NOTE: dont get confused with height, its from tree, TODO rename to txtWidth
           d.width = getTextDimensions(d.data.name)[0];
+          d.children_id = d.children ? d.children.map((c) => c.id) : [];
         })
 
         // grow tree to left if necessary
@@ -274,15 +275,6 @@ export function LobbyOrg() {
           const node = gNode
             .selectAll('g')
             .data(nodes, (d) => d.id)
-            .attr('class', (d) => {
-              if (d.depth === 1) {
-                return nodeLabel;
-              } else if (d.depth === 2) {
-                return leafLabel;
-              } else {
-                return null;
-              }
-            });
 
           // Enter any new nodes at the parent's previous position.
           const nodeEnter = node
@@ -295,6 +287,9 @@ export function LobbyOrg() {
             // make invisible first
             .attr('fill-opacity', 0)
             .attr('stroke-opacity', 0)
+            .attr('class', (d) =>
+              d.depth === 1 ? nodeLabel : d.depth === 2 ? leafLabel : null
+            )
             .on('click', (event, d) => {
               if (d.depth !== 1) return;
               d.children = d.children ? null : d._children;
@@ -360,7 +355,7 @@ export function LobbyOrg() {
 
           // Update the links…
           const link = gLink
-            .selectAll("path")
+            .selectAll('path')
             .data(links, (d) => d.target.id)
             .attr('class', (d) => {
               const [x, y] = [d.source.depth, d.target.depth].sort();
@@ -418,12 +413,12 @@ export function LobbyOrg() {
 
         const link = gLink
           .selectAll('path')
-          .data(links, (d) => d.target.id)
-          .attr('class', linkClass);
+          .data(links, (d) => d.target.id);
 
         const linkEnter = link
           .enter()
           .append('path')
+          .attr('class', linkClass)
           .attr('d', (d) => {
             const lc = leftCircles.filter((c) => c.data.id === d.source).datum();
             const rc = rightCircles.filter((c) => c.data.id === d.target).datum();
@@ -434,21 +429,32 @@ export function LobbyOrg() {
           .attr('fill', 'none')
           .attr('stroke', colorInactive)
           .attr('stroke-width', bulletRadius)
-          .each((d) => { 
-            // const id_closure = (node) => {
-            //   node.chi
-            // }
+          .each((d) => {
+            const linkIds = [d.source, d.target];
+            const branchNode = svg.selectAll('g.branch').filter((n) => linkIds.includes(n.id)).datum();
+            const partyNode = svg.selectAll('g.party').filter((n) => linkIds.includes(n.id)).datum();
             d.reachable = {
-              'org': [], // recursive aggregate closure of reachable isd
-              'parl': [] // recursive aggregate closure of reachable isd
+              'org': branchNode.children_id,
+              'parl': partyNode.children_id
             };
             return d;
           })
-          // .on("click", (e, d) => handleClick(d))
-          // .on("mouseover", (e, d) => {
-          //   d.k
-          // })
-          // .on("mouseout", (e, d) => handleMouseOut(d));
+          .on('mouseover', (e, d) => {
+            const prev = d3.select(e.target).attr('stroke');
+            d3.select(e.target).attr('stroke', prev === colorInactive ? colorActive : colorInactive);
+            // const link = svg.selectAll(`path.${linkClass}`).filter((l) => l.id === e.target.id);
+            console.log(e); 
+            // const link = svg.selectAll(`path.${linkClass}`)
+            //   .filter((l) => l.id === d.id);
+            //   .style('stroke', function () {
+            //       return d3.select(this).style("opacity") === "0" ? 1 : 0;
+            //   });
+            // console.log(link);
+          })
+          .on('mouseout', (e, d) => {
+            const prev = d3.select(e.target).attr('stroke');
+            d3.select(e.target).attr('stroke', prev === colorInactive ? colorActive : colorInactive);
+          });
 
       }; // END drawLinks
 
