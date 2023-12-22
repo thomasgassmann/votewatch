@@ -42,13 +42,15 @@ export function LobbyOrg({ lobbyOrgData }) {
     const horizontalIndentationBranch2org = (3 / 5) * width;
     const horizontalIndentationParty2parl = (2 / 5) * width;
 
+    const zoomScaleMin = 0.01;
+    const zoomScaleMax = 10.0;
+
     // DO NOT CHANGE  ---------------------------------------------------------
 
     const dummyRootId = -1;
     const dummyRootName = 'dummyRoot';
     const dummyRootCategory = 'dummy';
 
-    const container = d3.select('#container');
     const diagonal = d3.linkHorizontal().x((d) => d.y).y((d) => d.x);
 
     // DEFINITIONS ------------------------------------------------------------
@@ -66,6 +68,7 @@ export function LobbyOrg({ lobbyOrgData }) {
           -margin.left, -margin.bottom, width+margin.right, height+margin.top
         ]);
 
+      const gSvg = svg.append('g');
 
       // DEF: constructTreeRepresentation -------------------------------------
 
@@ -116,7 +119,7 @@ export function LobbyOrg({ lobbyOrgData }) {
         // grow tree to left if necessary
         tree(root).each((node) => node.y = (growLeft ? -1 : 1) * node.y);
 
-        const gLink = svg
+        const gLink = gSvg
           .append('g')
           .attr('fill', 'none')
           .attr('stroke', colorInactive)
@@ -124,7 +127,7 @@ export function LobbyOrg({ lobbyOrgData }) {
           .attr('stroke-width', bulletRadius)
           .attr('transform', `translate(${origin.x},${origin.y})`);
 
-        const gNode = svg
+        const gNode = gSvg
           .append('g')
           .attr('cursor', 'pointer')
           .attr('pointer-events', 'all')
@@ -149,7 +152,7 @@ export function LobbyOrg({ lobbyOrgData }) {
 
           // const height = right.x - left.x + margin.top + margin.bottom;
 
-          const transition = svg
+          const transition = gSvg
             .transition()
             .duration(duration);
 
@@ -191,6 +194,7 @@ export function LobbyOrg({ lobbyOrgData }) {
             .append('text')
             .text((d) => d.data.name)
             .attr('text-anchor', growLeft ? 'end' : 'start')
+            .attr('fill', colorFG)
             // TODO: add txtHeight to d, also adapt width to txtWidth
             .attr('dy', (d) => getTextDimensions(d.data.name)[1] / 4)
             .attr('dx', (growLeft ? -1 : 1) * bulletPadding)
@@ -237,16 +241,16 @@ export function LobbyOrg({ lobbyOrgData }) {
           // Update the links…
           const link = gLink
             .selectAll('path')
-            .data(links, (d) => d.target.id)
-            .attr('class', (d) => {
-              const [x, y] = [d.source.depth, d.target.depth].sort();
-              return (x === 1 && y === 2) ? `${nodeLabel}2${leafLabel}Link` : null;
-            });
+            .data(links, (d) => d.target.id);
 
           // enter any new links at the parent's previous position
           const linkEnter = link
             .enter()
             .append('path')
+            .attr('class', (d) => {
+              const [x, y] = [d.source.depth, d.target.depth].sort();
+              return (x === 1 && y === 2) ? nodeLabel : null;
+            })
             .attr('d', (d) => {
               const offset = (growLeft ? -1 : 1) * (2 * bulletPadding + source.width);
               const o = { x: source.x, y: source.y + offset };
@@ -285,7 +289,7 @@ export function LobbyOrg({ lobbyOrgData }) {
 
       const drawLinks = (links, leftOrigin, rightOrigin, leftCircles, rightCircles, linkClass) => {
 
-        const gLink = svg
+        const gLink = gSvg
           .append('g')
           .attr('fill', 'none')
           .attr('stroke', colorInactive)
@@ -312,30 +316,24 @@ export function LobbyOrg({ lobbyOrgData }) {
           .attr('stroke-width', bulletRadius)
           .each((d) => {
             const linkIds = [d.source, d.target];
-            const branchNode = svg.selectAll('g.branch').filter((n) => linkIds.includes(n.id)).datum();
-            const partyNode = svg.selectAll('g.party').filter((n) => linkIds.includes(n.id)).datum();
+            const branchNode = gSvg.selectAll('g.branch').filter((n) => linkIds.includes(n.id)).datum();
+            const partyNode = gSvg.selectAll('g.party').filter((n) => linkIds.includes(n.id)).datum();
             d.reachable = {
               'org': branchNode.children_id,
               'parl': partyNode.children_id
             };
             return d;
           })
-          .on('mouseover', (e, d) => {
-            const prev = d3.select(e.target).attr('stroke');
-            d3.select(e.target).attr('stroke', prev === colorInactive ? colorActive : colorInactive);
-            // const link = svg.selectAll(`path.${linkClass}`).filter((l) => l.id === e.target.id);
-            console.log(e);
-            // const link = svg.selectAll(`path.${linkClass}`)
-            //   .filter((l) => l.id === d.id);
-            //   .style('stroke', function () {
-            //       return d3.select(this).style("opacity") === "0" ? 1 : 0;
-            //   });
-            // console.log(link);
-          })
-          .on('mouseout', (e, d) => {
-            const prev = d3.select(e.target).attr('stroke');
-            d3.select(e.target).attr('stroke', prev === colorInactive ? colorActive : colorInactive);
+          .on('mouseover', (e) => highlightLinkReachable(e, colorActive))
+          .on('mouseout', (e) => highlightLinkReachable(e, colorInactive))
+          .on('click', (e) => {
+            color = d3.select(e.target).attr('stroke');
+            highlightLinkReachable(e, color === colorInactive ? colorActive : colorInactive)
           });
+
+        // increases z-order, i.e. do not paint over circles
+        const circles = gSvg.selectAll('circle');
+        circles.raise();
 
       }; // END drawLinks
 
@@ -372,72 +370,61 @@ export function LobbyOrg({ lobbyOrgData }) {
 
       // DRAW -----------------------------------------------------------------
 
-
       drawTree(treeRepBranch2org, originBranch2org, dx, dy, 'left', 'branch', 'org');
       drawTree(treeRepParty2parl, originParty2parl, dx, dy, 'right', 'party', 'parl');
 
-      const branchCircles = svg.selectAll('circle.branch');
-      const partyCircles = svg.selectAll('circle.party');
+      const branchCircles = gSvg.selectAll('circle.branch');
+      const partyCircles = gSvg.selectAll('circle.party');
 
       drawLinks(branch2party, originBranch2org, originParty2parl, branchCircles, partyCircles, 'branch2party');
 
       // UPDATE ---------------------------------------------------------------
 
+      // add SVG to container
+      const container = d3.select('#container');
       // Remove the existing SVG element
       container.selectAll('svg').remove();
       // Append the updated SVG element
       container.append(() => svg.node());
 
+      // Create a zoom behavior
+      const zoom = d3.zoom()
+        .scaleExtent([zoomScaleMin, zoomScaleMax])
+        .on('zoom', (e) => d3.select('svg g').attr('transform', e.transform));
+
+      // Call the zoom behavior on the SVG
+      svg.call(zoom);
+
+      // HELPER & HANDLER -----------------------------------------------------
+
+      // calculates text width dynamically
+      function getTextDimensions(text) {
+        const offScreenSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        document.body.appendChild(offScreenSvg);
+        const dummyText = d3.select(offScreenSvg).append("text").text(text).style('font', fontStyle).node();
+        const width = dummyText.getBBox().width;
+        const height = dummyText.getBBox().height;
+        offScreenSvg.remove();
+        return [width, height];
+      }
+
+      function highlightLinkReachable(e, color) {
+        const link = d3.select(e.target).attr('stroke', color).datum();
+        gSvg.selectAll('path.branch')
+          .filter((l) =>
+            link.reachable['org'].includes(l.source.id) ||
+            link.reachable['org'].includes(l.target.id)
+          )
+          .attr('stroke', color);
+        gSvg.selectAll('path.party')
+          .filter((l) =>
+            link.reachable['parl'].includes(l.source.id) ||
+            link.reachable['parl'].includes(l.target.id)
+          )
+          .attr('stroke', color);
+      }
+
     } // END drawVisualization
-
-    // HELPER -----------------------------------------------------------------
-
-    // Function to calculate text width dynamically
-    function getTextDimensions(text) {
-      const offScreenSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      document.body.appendChild(offScreenSvg);
-      const dummyText = d3.select(offScreenSvg).append("text").text(text).style('font', fontStyle).node();
-      const width = dummyText.getBBox().width;
-      const height = dummyText.getBBox().height;
-      offScreenSvg.remove();
-      return [width, height];
-    }
-
-    //   // Click event handler
-    //   function handleClick(d) {
-    //     const circles = rightAlignment ? leftCircles : rightCircles;
-    //     const selectedCircle = circles.filter((c) => c.id === d.id);
-    //     selectedCircle.transition()
-    //       .duration(duration)
-    //       // Toggle opacity give the current opacity
-    //       .style("opacity", function () {
-    //         return d3.select(this).style("opacity") === "0" ? 1 : 0;
-    //       });
-    //   }
-
-    //   // Mouseover event handler
-    //   function handleMouseOver(d) {
-    //     // Change the color on hover
-    //     d3.selectAll('path.branch2party')
-    //       .filter((c) => c.branch === d.id || c.party === d.id)
-    //       .attr('stroke', colorActive)
-    //     d3.select(this).selectAll("circle")
-    //       .style("fill", colorActive);
-    //     d3.select(this).selectAll("text")
-    //       .style("font-weight", "bold");
-    //   }
-
-    //   // Mouseout event handler
-    //   function handleMouseOut(d) {
-    //     // Restore the color on mouseout
-    //     d3.selectAll('path.branch2party')
-    //       .filter((c) => c.branch === d.id || c.party === d.id)
-    //       .attr('stroke', colorInactive)
-    //     d3.select(this).selectAll("circle")
-    //       .style("fill", colorInactive);
-    //     d3.select(this).selectAll("text")
-    //       .style("font-weight", "normal");
-    //   }
 
     drawVisualization(lobbyOrgData);
   }, []);
