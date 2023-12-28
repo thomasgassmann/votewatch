@@ -47,7 +47,7 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
     const width = 500;
     const height = 500;
 
-    const bulletRadius = 1;
+    const bulletRadius = 2;
     const bulletPadding = 7;
     const linkOpacity = 0.75;
     const duration = 250;
@@ -73,7 +73,7 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
     // DEFINITIONS ------------------------------------------------------------
 
     const drawVisualization = (data) => {
-      console.log(data);
+      // console.log(data);
 
       const svg = d3.create("svg")
         .attr('width', '100%')
@@ -199,8 +199,8 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
             .on('click', (e, d) => {
               const id = d.data.id;
               const links = gSvg
-                .selectAll('.party2party')
-                .filter((l) => l.source.id === id || l.target.id === id);
+                .selectAll('path.branch2party');
+                .filter((l) => l.source === id || l.target === id);
               const color = links.attr('stroke');
 
               links.attr('stroke',
