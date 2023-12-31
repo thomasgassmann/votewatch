@@ -1,7 +1,7 @@
 'use client'
 // vim: sw=2
 import * as d3 from "d3";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +38,7 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
   const colorInactive = darkMode ? colorDarkInactive : colorLightInactive;
 
   const [selected, setSelected] = useState(null);
+  const highlighted = useRef([]);
 
   useEffect(() => {
 
@@ -73,7 +74,7 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
     // DEFINITIONS ------------------------------------------------------------
 
     const drawVisualization = (data) => {
-      console.log(data);
+      // console.log(data);
 
       const svg = d3.create("svg")
         .attr('width', '100%')
@@ -196,10 +197,40 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
             .attr('class', (d) =>
               d.depth === 1 ? nodeLabel : d.depth === 2 ? leafLabel : null
             )
-            .on('click', (event, d) => {
-              if (d.depth !== 1) return;
-              d.children = d.children ? null : d._children;
-              update(d);
+            .on('click', (_, d) => {
+              const id = d.data.id;
+              const links = gSvg
+                .selectAll('path.branch2party')
+                .filter((l) => l.source === id || l.target === id);
+              const color = links.attr('stroke');
+              // links.attr('stroke',
+              //   color === colorInactive ? colorActive : colorInactive
+              // );
+
+              if (!highlighted.current.includes(id)) {
+                // add id to highlighted
+                highlighted.current = [...highlighted.current, id];
+              } else {
+                // remove id from highlighted
+                highlighted.current = highlighted.current.filter((i) => i !== id);
+              }
+              console.log(highlighted.current);
+            })
+            .on('mouseover', (_, d) => {
+              const id = d.data.id;
+              gSvg
+                .selectAll('path.branch2party')
+                .filter((l) => l.source === id || l.target === id)
+                .attr('stroke', colorActive);
+            })
+            .on('mouseout', (_, d) => {
+              const id = d.data.id;
+              if (!highlighted.current.includes(id)) {
+                gSvg
+                  .selectAll('path.branch2party')
+                  .filter((l) => l.source === id || l.target === id)
+                  .attr('stroke', colorInactive);
+              }
             });
 
           // inner circles
@@ -348,10 +379,10 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
             };
             return d;
           })
-          .on('click', (e, d) => {
+          .on('click', (_, d) => {
             setSelected(d);
           })
-          .on('mouseover', (e, d) => {
+          .on('mouseover', (e) => {
             highlightLinkReachable(e, colorActive);
           })
           .on('mouseout', (e) => {
