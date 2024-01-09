@@ -23,25 +23,28 @@ if (typeof window !== 'undefined') {
 export function LobbyOrg({ lobbyOrgData, orgs }) {
 
   const { resolvedTheme } = useTheme();
-  const darkMode = resolvedTheme === 'dark'; // dark native :^)
-
-  const colorLight = '#FFF';
-  const colorDark = '#000';
-  const colorLightInactive = "#555"
-  const colorLightActive = "#DD3333"
-  const colorDarkInactive = "#aaa"
-  const colorDarkActive = "#22aaff"
-
-  const colorFG = darkMode ? colorLight : colorDark;
-  const colorBG = darkMode ? colorDark : colorLight;
-  const colorActive = darkMode ? colorDarkActive : colorLightActive;
-  const colorInactive = darkMode ? colorDarkInactive : colorLightInactive;
 
   const [selected, setSelected] = useState(null);
   const highlighted_nodes = useRef([]);
   const highlighted_leaves = useRef([]);
 
   useEffect(() => {
+
+    // THEMING ----------------------------------------------------------------
+
+    const darkMode = resolvedTheme === 'dark'; // dark native :^)
+
+    const colorLight = '#FFF';
+    const colorDark = '#000';
+    const colorLightInactive = "#555"
+    const colorLightActive = "#DD3333"
+    const colorDarkInactive = "#aaa"
+    const colorDarkActive = "#22aaff"
+
+    const colorFG = darkMode ? colorLight : colorDark;
+    const colorBG = darkMode ? colorDark : colorLight;
+    const colorActive = darkMode ? colorDarkActive : colorLightActive;
+    const colorInactive = darkMode ? colorDarkInactive : colorLightInactive;
 
     // PARAMETERS -------------------------------------------------------------
 
@@ -171,9 +174,8 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
             .filter((l) => ![l.source.id, l.target.id].includes(root.id));
 
           // compute new tree layout
-          const left = d3.min(root.descendants(), (node) => node.x);
-          const right = d3.max(root.descendants(), (node) => node.x);
-
+          // const left = d3.min(root.descendants(), (node) => node.x);
+          // const right = d3.max(root.descendants(), (node) => node.x);
           // const height = right.x - left.x + margin.top + margin.bottom;
 
           const transition = gSvg
@@ -396,10 +398,6 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
           .on('mouseout', (e) => {
             highlightLinkReachable(e, colorInactive);
           });
-        // .on('click', (e) => {
-        //   color = d3.select(e.target).attr('stroke');
-        //   highlightLinkReachable(e, color === colorInactive ? colorActive : colorInactive)
-        // });
 
         // increases z-order, i.e. do not paint over circles
         const circles = gSvg.selectAll('circle');
@@ -497,7 +495,7 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
     } // END drawVisualization
 
     drawVisualization(lobbyOrgData);
-  }, [lobbyOrgData, setSelected]);
+  }, [lobbyOrgData, setSelected, resolvedTheme]);
 
   return (
     <>
