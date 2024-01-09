@@ -38,7 +38,8 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
   const colorInactive = darkMode ? colorDarkInactive : colorLightInactive;
 
   const [selected, setSelected] = useState(null);
-  const highlighted = useRef([]);
+  const highlighted_nodes = useRef([]);
+  const highlighted_leaves = useRef([]);
 
   useEffect(() => {
 
@@ -48,6 +49,7 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
     const width = 500;
     const height = 500;
 
+    const linkMinWidth = 0.05 
     const bulletRadius = 1;
     const bulletPadding = 7;
     const linkOpacity = 0.75;
@@ -74,7 +76,6 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
     // DEFINITIONS ------------------------------------------------------------
 
     const drawVisualization = (data) => {
-      // console.log(data);
 
       const svg = d3.create("svg")
         .attr('width', '100%')
@@ -199,22 +200,22 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
             )
             .on('click', (_, d) => {
               const id = d.data.id;
-              const links = gSvg
+              // ids of clicked node and all nodes directly linked to clicked node
+              let leaves = [];
+              gSvg
                 .selectAll('path.branch2party')
-                .filter((l) => l.source === id || l.target === id);
-              const color = links.attr('stroke');
-              // links.attr('stroke',
-              //   color === colorInactive ? colorActive : colorInactive
-              // );
+                .filter((l) => l.source === id || l.target === id)
+                .each((l) => leaves.push(id === l.source ? l.target : l.source));
 
-              if (!highlighted.current.includes(id)) {
+              if (!highlighted_nodes.current.includes(id)) {
                 // add id to highlighted
-                highlighted.current = [...highlighted.current, id];
+                highlighted_nodes.current = [...highlighted_nodes.current, id];
+                highlighted_leaves.current = [highlighted_leaves.current, ...leaves]
               } else {
                 // remove id from highlighted
-                highlighted.current = highlighted.current.filter((i) => i !== id);
+                highlighted_nodes.current = highlighted_nodes.current.filter((i) => i !== id);
+                highlighted_leaves.current = highlighted_leaves.current.filter((i) => !leaves.includes(i));
               }
-              console.log(highlighted.current);
             })
             .on('mouseover', (_, d) => {
               const id = d.data.id;
@@ -225,12 +226,21 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
             })
             .on('mouseout', (_, d) => {
               const id = d.data.id;
-              if (!highlighted.current.includes(id)) {
-                gSvg
+              // node with id has not been clicked
+              if (!highlighted_nodes.current.includes(id)) {
+                // all links associated with node with id
+                const links = gSvg
                   .selectAll('path.branch2party')
-                  .filter((l) => l.source === id || l.target === id)
-                  .attr('stroke', colorInactive);
-              }
+                  .filter((l) => l.source === id || l.target === id);
+
+                // reset all links
+                links.attr('stroke', colorInactive);
+
+                // highlight only the remembered ones
+                links
+                  .filter((l) => highlighted_nodes.current.includes(id === l.source ? l.target : l.source))
+                  .attr('stroke', colorActive);
+              } // node with id has been clicked, do nothing
             });
 
           // inner circles
@@ -366,9 +376,7 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
           })
           .attr('fill', 'none')
           .attr('stroke', colorInactive)
-          .attr('stroke-width', (d) => {
-            return d.influence_strength;
-          })
+          .attr('stroke-width', (d) => linkMinWidth + d.influence_strength)
           .each((d) => {
             const linkIds = [d.source, d.target];
             const branchNode = gSvg.selectAll('g.branch').filter((n) => linkIds.includes(n.id)).datum();
