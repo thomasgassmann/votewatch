@@ -396,10 +396,18 @@ export function LobbyOrg({ lobbyOrgData, orgs }) {
             highlightLinkReachable(e, colorActive);
           })
           .on('mouseout', (e) => {
-            highlightLinkReachable(e, colorInactive);
+            const link = d3.select(e.target).datum();
+            const source = link.source;
+            const target = link.target;
+            const isHighlighted = (s, t) =>
+              (highlighted_nodes.current.includes(s) && highlighted_leaves.current.includes(t));
+
+            if (!(isHighlighted(source, target) || isHighlighted(target, source))) {
+              highlightLinkReachable(e, colorInactive);
+            }
           });
 
-        // increases z-order, i.e. do not paint over circles
+        // increases z-order, i.e. do not paint over circles TODO: does not work?
         const circles = gSvg.selectAll('circle');
         circles.raise();
 
